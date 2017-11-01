@@ -382,7 +382,7 @@
 
 	function pressMortgageButton() {
 		var button = document.getElementById("mortgagebutton").click();
-		say("You have successfully mortgaged this property.");
+		say("Select yes to confirm your mortgage, or no to cancel.");
 	}
 
 	function pressSellHouseButton() {
@@ -392,7 +392,7 @@
 
 	function pressStatsButton() {
 		var button = document.getElementById("viewstats").click();
-		say("Here is an overview of each players account.");
+		say("Here is an overview of each players account. Click anywhere to exit.");
 	}
 
 	function pressProposeTradeButton() {
@@ -420,24 +420,66 @@
 		say("Handing over the dice to the next player");
 	}
 
+	function pressResignButton() {
+		var button = document.getElementById("resignbutton").click();
+		say("Better luck next time!");
+	}
+
 	if (annyang) {
-	// Let's define our first command. First the text we expect, and then the function it should call
+	/* Buttons within index can be clicked by uttering these commands
+	 	 Buttons generated elsewhere are listed below the working commands */
 	var commands = {
 		'start game': pressStartButton,
+
 		'roll dice' : pressRollDiceButton,
 		'roll again' : pressRollDiceButton,
-		'buy property' : pressBuyButton,	//Doesn't press button right now
-		'view stats' : pressStatsButton,	//Still have to click to exit stats
-		'buy house' : pressBuyHouseButton,
-		'sell house' : pressSellHouseButton,
-		'mortgage property' : pressMortgageButton,
-		'propose trade' : pressProposeTradeButton,	//Alert pops up and must click confirm
-		'cancel trade' : pressCancelTradeButton,
-		'reject trade' : pressRejectTradeButton,
-		'accept trade' : pressAcceptTradeButton, //Alert pops up and must click confirm
-		'end turn' : pressEndTurnButton
 
+		'view stats' : pressStatsButton,	//Still have to click anywhere or 'x' to exit stats
 
+		//Manage Tab Buttons (Tab button not in index)
+		'buy house' : pressBuyHouseButton,	//No confirmation required
+		'sell house' : pressSellHouseButton,	//No confirmation required
+		'mortgage property' : pressMortgageButton, 	//Confirm with 'yes' or 'no' button
+
+		//Trade Tab Buttons (Tab button not in index)
+		'propose trade' : pressProposeTradeButton,	//Alert pops up and must click to confirm
+		'cancel trade' : pressCancelTradeButton,	//No confirmation needed
+		'reject trade' : pressRejectTradeButton,	//No confirmation needed
+		'accept trade' : pressAcceptTradeButton, //Alert pops up and must click to confirm
+
+		'end turn' : pressEndTurnButton,
+
+		'resign' : pressResignButton
+
+		//Buttons not accessible within index
+
+		/*	'Buy' Tab
+		'buy tab' : pressBuyTabButton,	//Navigate to 'Buy' tab
+		'buy property' : pressBuyButton,	//Buy property on current space
+		"Ok" pop-up appears when you can't afford to buy property
+		*/
+
+		/*'Manage' Tab
+		 'unmortgage property' : '"Unmortgage" button is generated when you have a mortgaged property
+		 "Yes or no" pop-up appears after pressing mortgage and unmortgage
+		*/
+
+		/*	'Trade' Tab
+		Alert appears when proposing or accecpting Trade
+		"Ok" pop-up appears for tradee after proposing trade
+		*/
+
+		/*Auction Buttons
+	  'bid money' : pressBidButton,
+		'pass' : pressPassButton,
+		'exit auction' : pressExitAuctionButton, //(creates alert where you must click okay or cancel)
+		*/
+
+		/*	Misc Buttons
+		"Ok" pop-up after landing on Chance/Community Chest
+		'pay fine' : "Pay $50 Fine" button appears when in jail
+		"Yes or No" pop-up after clicking resign button
+		*/
 
 
 	};
