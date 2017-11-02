@@ -358,15 +358,16 @@
 
 	<!--//voice recognition magic!-->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+	<script src="../DialogueSystem/interface.js"></script>
 	<script>
 
 	function pressStartButton() {
-		var button = document.getElementById("start game").click();
+		Interface.pressButton("start game");
 		say("Come on, let's play Monopoly!");
 	}
 
 	function pressRollDiceButton() {
-		var button = document.getElementById("nextbutton").click();
+		Interface.pressButton("nextbutton");
 		say("Let's get a move on!");
 	}
 
@@ -376,52 +377,52 @@
 	}
 
 	function pressBuyHouseButton() {
-		var button = document.getElementById("buyhousebutton").click();
+		Interface.pressButton("buyhousebutton");
 		say("You have successfully purchase a house for this property.");
 	}
 
 	function pressMortgageButton() {
-		var button = document.getElementById("mortgagebutton").click();
+		Interface.pressButton("mortgagebutton");
 		say("Select yes to confirm your mortgage, or no to cancel.");
 	}
 
 	function pressSellHouseButton() {
-		var button = document.getElementById("sellhousebutton").click();
+		Interface.pressButton("sellhousebutton");
 		say("You successfully sold a house on this property.");
 	}
 
 	function pressStatsButton() {
-		var button = document.getElementById("viewstats").click();
+		Interface.pressButton("viewstats");
 		say("Here is an overview of each players account. Click anywhere to exit.");
 	}
 
 	function pressProposeTradeButton() {
-		var button = document.getElementById("proposetradebutton").click();
+		Interface.pressButton("proposetradebutton");
 		say("Please confirm your proposed trade by clicking okay.");
 	}
 
 	function pressCancelTradeButton() {
-		var button = document.getElementById("canceltradebutton").click();
+		Interface.pressButton("canceltradebutton");
 		say("Cancelling trade.");
 	}
 
 	function pressRejectTradeButton() {
-		var button = document.getElementById("rejecttradebutton").click();
+		Interface.pressButton("rejecttradebutton")
 		say("You have rejected the proposed trade.");
 	}
 
 	function pressAcceptTradeButton() {
-		var button = document.getElementById("accepttradebutton").click();
+		Interface.pressButton("accepttradebutton");
 		say("You have accepted the proposed trade.");
 	}
 
 	function pressEndTurnButton() {
-		var button = document.getElementById("nextbutton").click();
+		Interface.pressButton("nextbutton");
 		say("Handing over the dice to the next player");
 	}
 
 	function pressResignButton() {
-		var button = document.getElementById("resignbutton").click();
+		Interface.pressButton("resignbutton");
 		say("Better luck next time!");
 	}
 
