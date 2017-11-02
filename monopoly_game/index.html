@@ -473,6 +473,11 @@
 		say("Paying bailout fees");
 	}
 
+	function pressUseCardButton() {
+		Interface.pressButton("gojfbutton");
+		say("Using get out of jail free card");
+	}
+
 	function pressPopUpYesButton() {
 		Interface.pressButton("popupyes");
 		say("you got it boss");
@@ -522,6 +527,7 @@
 
 		'okay' : pressClosePopUpButton, //works through test function but not through voice
 		'pay fine' : pressPay50DollarFineButton,
+		'use card' : pressUseCardButton,
 		'yes' : pressPopUpYesButton,
 		'no' : pressPopUpNoButton
 
