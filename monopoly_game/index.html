@@ -373,7 +373,7 @@
 
 	function pressBuyPropertyButton() {
 		Interface.pressButton("buy property");
-		say("You successfully purchased Property Name for x dollars");
+		say("You successfully purchased this property");
 	}
 
 	function pressBuyHouseButton() {
@@ -386,14 +386,9 @@
 		say("Select yes to confirm your mortgage, or no to cancel.");
 	}
 
-	function pressMortgageButton() {
-		Interface.pressButton("mortgagebutton");
-		say("Select yes to confirm your unmortgage, or no to cancel.");
-	}
-
 	function pressUnmortgageButton() {
 		Interface.pressButton("mortgagebutton");
-		say("Select yes to confirm your mortgage, or no to cancel.");
+		say("Select yes to confirm your unmortgage, or no to cancel.");
 	}
 
 	function pressSellHouseButton() {
@@ -460,12 +455,12 @@
 
 	function pressPassButton() {
 		Interface.pressButton("pass button");
-		say("passing on bid");
+		say("Passing on bid");
 	}
 
 	function pressExitAuctionButton() {
 		Interface.pressButton("exit auction button");
-		say("passing on bid");
+		say("Exiting auction");
 	}
 
 	function pressClosePopUpButton() {
@@ -525,7 +520,7 @@
 		'exit auction' : pressExitAuctionButton, //(creates alert where you must click okay or cancel)
 
 
-		'Ok' : pressClosePopUpButton, //works through test function but not through voice
+		'okay' : pressClosePopUpButton, //works through test function but not through voice
 		'pay fine' : pressPay50DollarFineButton,
 		'yes' : pressPopUpYesButton,
 		'no' : pressPopUpNoButton
