@@ -7,3 +7,6 @@
   the trade.
 - Auctions don't trigger when clicking "roll again".
   They trigger at the end of the turn instead.
+- When manageing properties if you click any property besides the first one
+  everything gets unchecked and sometimes you can't check any of the properties
+  anymore
