@@ -272,15 +272,15 @@
 							<tr>
 								<td class="menu-item" id="buy-menu-item">
 
-									<a href="javascript:void(0);" title="View alerts and buy the property you landed on.">Buy</a>
+									<a href="javascript:void(0);" title="View alerts and buy the property you landed on." id="buy tab">Buy</a>
 								</td>
 								<td class="menu-item" id="manage-menu-item">
 
-									<a href="javascript:void(0);" title="View, mortgage, and improve your property. ">Manage</a>
+									<a href="javascript:void(0);" title="View, mortgage, and improve your property. " id="manage tab">Manage</a>
 								</td>
 								<td class="menu-item" id="trade-menu-item">
 
-									<a href="javascript:void(0);" title="Exchange property with other players.">Trade</a>
+									<a href="javascript:void(0);" title="Exchange property with other players." id="trade tab">Trade</a>
 								</td>
 							</tr>
 						</table>
@@ -358,76 +358,141 @@
 
 	<!--//voice recognition magic!-->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+	<script src="../DialogueSystem/interface.js"></script>
 	<script>
 
 	function pressStartButton() {
-		var button = document.getElementById("start game").click();
+		Interface.pressButton("start game");
 		say("Come on, let's play Monopoly!");
 	}
 
 	function pressRollDiceButton() {
-		var button = document.getElementById("nextbutton").click();
+		Interface.pressButton("nextbutton");
 		say("Let's get a move on!");
 	}
 
-	function pressBuyButton() {
-		//var button = document.getElementById("nextbutton").click();
-		say("You successfully purchases Property Name for x dollars");
+	function pressBuyPropertyButton() {
+		Interface.pressButton("buy property");
+		say("You successfully purchased this property");
 	}
 
 	function pressBuyHouseButton() {
-		var button = document.getElementById("buyhousebutton").click();
+		Interface.pressButton("buyhousebutton");
 		say("You have successfully purchase a house for this property.");
 	}
 
 	function pressMortgageButton() {
-		var button = document.getElementById("mortgagebutton").click();
+		Interface.pressButton("mortgagebutton");
 		say("Select yes to confirm your mortgage, or no to cancel.");
 	}
 
+	function pressUnmortgageButton() {
+		Interface.pressButton("mortgagebutton");
+		say("Select yes to confirm your unmortgage, or no to cancel.");
+	}
+
 	function pressSellHouseButton() {
-		var button = document.getElementById("sellhousebutton").click();
+		Interface.pressButton("sellhousebutton");
 		say("You successfully sold a house on this property.");
 	}
 
 	function pressStatsButton() {
-		var button = document.getElementById("viewstats").click();
+		Interface.pressButton("viewstats");
 		say("Here is an overview of each players account. Click anywhere to exit.");
 	}
 
 	function pressProposeTradeButton() {
-		var button = document.getElementById("proposetradebutton").click();
+		Interface.pressButton("proposetradebutton");
 		say("Please confirm your proposed trade by clicking okay.");
 	}
 
 	function pressCancelTradeButton() {
-		var button = document.getElementById("canceltradebutton").click();
+		Interface.pressButton("canceltradebutton");
 		say("Cancelling trade.");
 	}
 
 	function pressRejectTradeButton() {
-		var button = document.getElementById("rejecttradebutton").click();
+		Interface.pressButton("rejecttradebutton")
 		say("You have rejected the proposed trade.");
 	}
 
 	function pressAcceptTradeButton() {
-		var button = document.getElementById("accepttradebutton").click();
+		Interface.pressButton("accepttradebutton");
 		say("You have accepted the proposed trade.");
 	}
 
 	function pressEndTurnButton() {
-		var button = document.getElementById("nextbutton").click();
+		Interface.pressButton("nextbutton");
 		say("Handing over the dice to the next player");
 	}
 
 	function pressResignButton() {
-		var button = document.getElementById("resignbutton").click();
+		Interface.pressButton("resignbutton");
 		say("Better luck next time!");
 	}
 
+	function pressBuyTabButton() {
+		Interface.pressButton("buy tab");
+		say("Opening buy tab");
+	}
+
+
+	function pressManageTabButton() {
+		Interface.pressButton("manage tab");
+		say("Opening manage tab");
+
+	}
+
+	function pressTradeTabButton() {
+		Interface.pressButton("trade tab");
+		say("Opening trade tab");
+	}
+
+	function pressBidButton() {
+		Interface.pressButton("bid button");
+		say("placing bid");
+	}
+
+	function pressPassButton() {
+		Interface.pressButton("pass button");
+		say("Passing on bid");
+	}
+
+	function pressExitAuctionButton() {
+		Interface.pressButton("exit auction button");
+		say("Exiting auction");
+	}
+
+	function pressClosePopUpButton() {
+		Interface.pressButton("popupclose");
+		say("Alright boss");
+	}
+
+	function pressPay50DollarFineButton() {
+		Interface.pressButton("pay $50 fine");
+		say("Paying bailout fees");
+	}
+
+	function pressUseCardButton() {
+		Interface.pressButton("gojfbutton");
+		say("Using get out of jail free card");
+	}
+
+	function pressPopUpYesButton() {
+		Interface.pressButton("popupyes");
+		say("you got it boss");
+	}
+
+	function pressPopUpNoButton() {
+		Interface.pressButton("popupno");
+		say("you got it boss");
+	}
+
+
+
+
 	if (annyang) {
-	/* Buttons within index can be clicked by uttering these commands
-	 	 Buttons generated elsewhere are listed below the working commands */
+	/* Buttons within index can be clicked by uttering these commands */
 	var commands = {
 		'start game': pressStartButton,
 
@@ -436,50 +501,36 @@
 
 		'view stats' : pressStatsButton,	//Still have to click anywhere or 'x' to exit stats
 
-		//Manage Tab Buttons (Tab button not in index)
+		'manage tab' : pressManageTabButton,
 		'buy house' : pressBuyHouseButton,	//No confirmation required
 		'sell house' : pressSellHouseButton,	//No confirmation required
 		'mortgage property' : pressMortgageButton, 	//Confirm with 'yes' or 'no' button
+		'unmortgage property' : pressUnmortgageButton,	//Confirm with 'yes' or 'no' button
 
-		//Trade Tab Buttons (Tab button not in index)
+		'trade tab' : pressTradeTabButton,
 		'propose trade' : pressProposeTradeButton,	//Alert pops up and must click to confirm
 		'cancel trade' : pressCancelTradeButton,	//No confirmation needed
 		'reject trade' : pressRejectTradeButton,	//No confirmation needed
-		'accept trade' : pressAcceptTradeButton, //Alert pops up and must click to confirm
+		'accept trade' : pressAcceptTradeButton, 	//Alert pops up and must click to confirm
 
 		'end turn' : pressEndTurnButton,
 
-		'resign' : pressResignButton
+		'resign' : pressResignButton,
 
-		//Buttons not accessible within index
+		'buy tab' : pressBuyTabButton,
+		'buy property' : pressBuyPropertyButton, //"Ok" pop-up appears when you can't afford to buy property
 
-		/*	'Buy' Tab
-		'buy tab' : pressBuyTabButton,	//Navigate to 'Buy' tab
-		'buy property' : pressBuyButton,	//Buy property on current space
-		"Ok" pop-up appears when you can't afford to buy property
-		*/
-
-		/*'Manage' Tab
-		 'unmortgage property' : '"Unmortgage" button is generated when you have a mortgaged property
-		 "Yes or no" pop-up appears after pressing mortgage and unmortgage
-		*/
-
-		/*	'Trade' Tab
-		Alert appears when proposing or accecpting Trade
-		"Ok" pop-up appears for tradee after proposing trade
-		*/
-
-		/*Auction Buttons
-	  'bid money' : pressBidButton,
+		'bid money' : pressBidButton,
 		'pass' : pressPassButton,
 		'exit auction' : pressExitAuctionButton, //(creates alert where you must click okay or cancel)
-		*/
 
-		/*	Misc Buttons
-		"Ok" pop-up after landing on Chance/Community Chest
-		'pay fine' : "Pay $50 Fine" button appears when in jail
-		"Yes or No" pop-up after clicking resign button
-		*/
+
+		'okay' : pressClosePopUpButton, //works through test function but not through voice
+		'pay fine' : pressPay50DollarFineButton,
+		'use card' : pressUseCardButton,
+		'yes' : pressPopUpYesButton,
+		'no' : pressPopUpNoButton
+
 
 
 	};

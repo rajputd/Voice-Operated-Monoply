@@ -13,8 +13,8 @@ app.get('/monopoly_game/index.html', function(req, res) {
     res.sendFile(path.join(__dirname + '/monopoly_game/index.html'));
 });
 
-
+//make the following directors publically accessable
 app.use('/monopoly_game', express.static(path.join(__dirname + '/monopoly_game')));
-
+app.use('/DialogueSystem', express.static(path.join(__dirname + '/DialogueSystem')));
 
 app.listen(8080);

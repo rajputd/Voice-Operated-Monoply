@@ -3,7 +3,13 @@
 - Collect $10 from every player does not create negative amount when collecting
   from player with $0.
 - Encountered infinite loop after resigning
-- Sometimes propose trade has to be clicked by tradee, despite not modifying
+- Sometimes proposed trade has to be clicked by tradee, despite not modifying
   the trade.
 - Auctions don't trigger when clicking "roll again".
   They trigger at the end of the turn instead.
+- When managing properties if you click any property besides the first one
+  everything gets unchecked and sometimes you can't check any of the properties
+  anymore
+- Unsure how game handles "Get out of Jail free" card once you land in jail.
+  Ideally, we don't want to force users to use the card if they want to stay in
+  jail to avoid paying rent.
