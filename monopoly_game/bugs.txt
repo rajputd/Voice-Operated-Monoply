@@ -1,0 +1,12 @@
+- Player landed on jail but wasn't moved
+- Player paid $50 fine with $0 in account and then had balance of -$50
+- Collect $10 from every player does not create negative amount when collecting
+  from player with $0.
+- Encountered infinite loop after resigning
+- Sometimes propose trade has to be clicked by tradee, despite not modifying
+  the trade.
+- Auctions don't trigger when clicking "roll again".
+  They trigger at the end of the turn instead.
+- When manageing properties if you click any property besides the first one
+  everything gets unchecked and sometimes you can't check any of the properties
+  anymore

@@ -15,6 +15,7 @@ A voice operated Monopoly game that takes the monotony out of Monopoly. Users ca
 
 ##### Installation Steps
 
-1. run `node app.js` in the terminal to start the server
-2. on a browser navigate to localhost:8080/monopoly_game/index.html
-3. You should be able to play the game now
+1. run `npm install` in the terminal to get all of the project dependencies
+2. run `node app.js` in the terminal to start the server
+3. on a browser navigate to localhost:8080/monopoly_game/index.html
+4. You should be able to play the game now
