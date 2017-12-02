@@ -1,0 +1,16 @@
+{
+  "name": "voiceoperatedmonopoly",
+  "version": "1.0.0",
+  "description": "Voice assistant to the popular board game monopoly",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nick Wilbur, Ernie Chu, and Dileep Rajput",
+  "license": "ISC",
+  "dependencies": {
+    "actions-on-google": "^1.6.1",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2"
+  }
+}
