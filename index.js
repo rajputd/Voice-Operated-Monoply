@@ -21,6 +21,7 @@ const SET_PLAYER_NUM_ACTION = 'set_player_num';
 const SET_NAMES_ACTION = 'get_names';
 const SET_NAMES_YES_ACTION = 'setNames.setNames-yes';
 const ROLL_DICE_ACTION = 'roll_dice';
+const GET_MY_ACCOUNT_BALANCE_ACTION = 'get_my_account_balance';
 
 // the parameters that are parsed from the make_name intent 
 const NUM_PLAYERS_ARGUMENT = 'num_players';
@@ -38,6 +39,7 @@ app.post('/', function (request, response) {
 	actionMap.set(SET_NAMES_ACTION, set_names);
 	actionMap.set(SET_NAMES_YES_ACTION, start_game);
 	actionMap.set(ROLL_DICE_ACTION, roll_dice);
+	actionMap.set(GET_MY_ACCOUNT_BALANCE_ACTION, get_my_account_balance);
 
 
 	app.handleRequest(actionMap);
@@ -100,3 +102,8 @@ function roll_dice(app) {
 	app.ask('You rolled double sixes hurray!');
 }
 
+function get_my_account_balance(app) {
+	//get current player name
+	//look up how much money they have
+	app.ask('You have $1500 in your bank account');
+}
