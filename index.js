@@ -18,6 +18,7 @@ const CONFIRM_NAMES_CONTEXT = 'confirmNames';
 // the action name from the make_name Dialogflow intent
 const SET_PLAYER_NUM_ACTION = 'set_player_num';
 const SET_NAMES_ACTION = 'get_names';
+const SET_NAMES_YES_ACTION = 'setNames.setNames-yes';
 
 // the parameters that are parsed from the make_name intent 
 const NUM_PLAYERS_ARGUMENT = 'num_players';
@@ -33,6 +34,7 @@ app.post('/', function (request, response) {
 	let actionMap = new Map();
 	actionMap.set(SET_PLAYER_NUM_ACTION, set_player_num);
 	actionMap.set(SET_NAMES_ACTION, set_names);
+	actionMap.set(SET_NAMES_YES_ACTION, start_game);
 
 
 	app.handleRequest(actionMap);
@@ -70,6 +72,14 @@ function set_names(app) {
 		app.ask('Alright, so our ' + app.data.player_num + ' players are ' + player_names.slice(0, player_names.length - 1) + 
 				' and ' + player_names[player_names.length - 1] + '. Did I get everyone?');
 	}
+}
+
+function start_game(app) {
+	//instantiate players from app.data.player_names
+	//app.data.board = new Board
+	//select a random player
+	var current_player = 'some player';
+	app.ask('Great! The game will now start. ' + current_player + ' will go first. During your turn, you can  check your balance, mortgage and unmortgage any properties you own, buy and sell houses on any properties you have a monopoly on, trade with other players, and roll the dice to move.');
 }
 
 
