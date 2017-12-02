@@ -20,6 +20,7 @@ const TURN_ACTION_CONTEXT = 'turn_action';
 const SET_PLAYER_NUM_ACTION = 'set_player_num';
 const SET_NAMES_ACTION = 'get_names';
 const SET_NAMES_YES_ACTION = 'setNames.setNames-yes';
+const ROLL_DICE_ACTION = 'roll_dice';
 
 // the parameters that are parsed from the make_name intent 
 const NUM_PLAYERS_ARGUMENT = 'num_players';
@@ -36,6 +37,7 @@ app.post('/', function (request, response) {
 	actionMap.set(SET_PLAYER_NUM_ACTION, set_player_num);
 	actionMap.set(SET_NAMES_ACTION, set_names);
 	actionMap.set(SET_NAMES_YES_ACTION, start_game);
+	actionMap.set(ROLL_DICE_ACTION, roll_dice);
 
 
 	app.handleRequest(actionMap);
@@ -84,5 +86,17 @@ function start_game(app) {
 	app.ask('Great! The game will now start. ' + current_player + ' will go first. During your turn, you can  check your balance, mortgage and unmortgage any properties you own, buy and sell houses on any properties you have a monopoly on, trade with other players, and roll the dice to move.');
 }
 
-
+function roll_dice(app) {
+	//get player whose turn it is
+	//check if they've rolled the dice already
+	//check if they're in jail, if yes roll for doubles for freedom, else wait
+	//roll the dice
+	//move them to the appropriate spot
+	//tell them where they landed
+	//execute any special thing they have to do e.g. go to jail, buy a property or auction it off
+	//let them know if they've passed go
+	//let them know that they've rolled doubles and can go again
+	//send them to jail for speeding if they've rolled doubles 3 times
+	app.ask('You rolled double sixes hurray!');
+}
 
