@@ -14,6 +14,7 @@ app.use(bodyParser.json({type: 'application/json'}));
 // the context names
 const SET_NAMES_CONTEXT = 'set_names';
 const CONFIRM_NAMES_CONTEXT = 'confirmNames';
+const TURN_ACTION_CONTEXT = 'turn_action';
 
 // the action name from the make_name Dialogflow intent
 const SET_PLAYER_NUM_ACTION = 'set_player_num';
@@ -79,6 +80,7 @@ function start_game(app) {
 	//app.data.board = new Board
 	//select a random player
 	var current_player = 'some player';
+	app.setContext(TURN_ACTION_CONTEXT);
 	app.ask('Great! The game will now start. ' + current_player + ' will go first. During your turn, you can  check your balance, mortgage and unmortgage any properties you own, buy and sell houses on any properties you have a monopoly on, trade with other players, and roll the dice to move.');
 }
 
