@@ -66,6 +66,7 @@ function set_names(app) {
 			+ app.data.player_num + ' players. Please list the names again');
 	} else {
 		app.setContext(CONFIRM_NAMES_CONTEXT, 1);
+		app.data.player_names = player_names;
 		app.ask('Alright, so our ' + app.data.player_num + ' players are ' + player_names.slice(0, player_names.length - 1) + 
 				' and ' + player_names[player_names.length - 1] + '. Did I get everyone?');
 	}
