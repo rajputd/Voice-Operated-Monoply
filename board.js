@@ -1,5 +1,8 @@
 module.exports = {
 
+    numHouses: 32,
+    numHotels: 12,
+
     //Contains information about each player
     Player: function Player(name) {
 
@@ -236,6 +239,137 @@ module.exports = {
         	    console.log("After the unmortage, the player has " + player.get_cash() + ".");
         	}
         }
+    },
+
+    // Buy one building on the passed property
+    buyBuilding: function(player, property){
+
+        var monopoly = property.is_monopoly();
+        var numBuildings = property.get_num_buildings();
+
+        var numHouses = module.exports.numHouses;
+        var numHotels = module.exports.numHotels;
+
+        //Check to see if there is a monopoly on a property
+        if(!monopoly){
+            console.log("You cannot build on " + property.get_name() + " because you do not have a monopoly on this color-group.");
+            return;
+        }
+
+        //Too many buildings
+        if (numBuildings === 5){
+            console.log("You cannot build any more buildings on this property.");
+            return;
+        }
+
+        var playerProperties = player.get_prop_list();
+        var color = property.get_group();
+        var colorProps = [];
+
+        //Get other properties in color group
+        for (i = 0; i < playerProperties.length; i++){
+            var prop = playerProperties[i];
+            var propColor = prop.get_group();
+
+            //If property is in color-group of passed property, push to colorProps array
+            if (color === propColor && prop !== property)
+                colorProps.push(prop);
+        }
+
+        //Color-groups with two properties
+        if (color === "purple" || color === "dark-blue"){
+            var prop1 = colorProps[0];
+
+            //Get number of buildings on both properties
+            var propBuildings = property.get_num_buildings();
+            var prop1Buildings = prop1.get_num_buildings();
+
+            //Check if building evenly
+            if (propBuildings === prop1Buildings || propBuildings === prop1Buildings - 1){
+                var cost = property.get_build_cost();
+
+                if (numBuildings < 4){
+
+                    if (numHouses === 0){
+                        console.log("Sorry, there are no houses left in the bank.");
+                        return;
+                    }
+
+                    console.log("Building a house on " + property.get_name() + " for $" + cost + ".");
+                    property.set_num_buildings(property.get_num_buildings() + 1);
+                    player.set_cash(player.get_cash() - cost);
+                    module.exports.numHouses--;
+                }
+
+                else if (numBuildings === 4){
+
+                    if (numHotels === 0){
+                        console.log("Sorry, there are no hotels left in the bank.");
+                        return;
+                    }
+
+                    console.log("Bulding a hotel on " + property.get_name() + " for $" + cost + ".");
+                    property.set_num_buildings(property.get_num_buildings() + 1);
+                    player.set_cash(player.get_cash() - cost);
+                    module.exports.numHotels--;
+                    module.exports.numHouses += 4;
+                }
+            }
+
+            else
+                console.log("You can't build on this property because you don't have enough buildings on the other property in this color-group.");
+        }
+
+        //Color-groups with three properties
+        else {
+            var prop1 = colorProps[0];
+            var prop2 = colorProps[0];
+
+            //Get number of buildings on both properties
+            var propBuildings = property.get_num_buildings();
+            var prop1Buildings = prop1.get_num_buildings();
+            var prop2Buildings = prop2.get_num_buildings();
+
+            //Check if building evenly
+            if ((propBuildings === prop1Buildings && propBuildings === prop2Buildings)
+                    || (propBuildings === prop1Buildings - 1 && propBuildings === prop2Buildings)
+                    || (propBuildings === prop2Buildings - 1 && propBuildings === prop1Buildings)
+                    || (propBuildings === prop1Buildings - 1 && propBuildings === prop2Buildings - 1)){
+                var cost = property.get_build_cost();
+
+                if (numBuildings < 4){
+
+                    if (numHouses === 0){
+                        console.log("Sorry, there are no houses left in the bank.");
+                        return;
+                    }
+
+                    console.log("Building a house on " + property.get_name() + " for $" + cost + ".");
+                    property.set_num_buildings(property.get_num_buildings() + 1);
+                    player.set_cash(player.get_cash() - cost);
+                    module.exports.numHouses--;
+                }
+
+                else if (numBuildings === 4){
+
+                    if (numHotels === 0){
+                        console.log("Sorry, there are no hotels left in the bank.");
+                        return;
+                    }
+
+                    console.log("Bulding a hotel on " + property.get_name() + " for $" + cost + ".");
+                    property.set_num_buildings(property.get_num_buildings() + 1);
+                    player.set_cash(player.get_cash() - cost);
+                    module.exports.numHotels--;
+                    module.exports.numHouses += 4;
+                }
+            }
+
+            //Check if not building evenly
+            else
+                console.log("You can't build on this property because you don't have enough buildings on the other properties in this color-group.");
+        }
+
     },
 
     // Jail function

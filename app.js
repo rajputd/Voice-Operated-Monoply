@@ -159,8 +159,17 @@ var doubles = board.rollDice()[1];      //Doubles boolean
 
 var newSpace = board.getNewSpace(player1, gameBoard, diceSum);
 
-player1.give_chanceJail();
-player1.set_jail_turn(1);
+player1.add_property(AtlAve);
+player1.add_property(VentAve);
+player1.add_property(MarvGard);
 
-//console.log(chanceCards);
-board.movePlayer(player1, gameBoard, players, diceSum, space30, chanceCards, chestCards);
+AtlAve.set_num_buildings(2);
+VentAve.set_num_buildings(2);
+MarvGard.set_num_buildings(1);
+
+AtlAve.set_monopoly_true();
+VentAve.set_monopoly_true();
+MarvGard.set_monopoly_true();
+
+board.buyBuilding(player1, MarvGard);
+console.log(player1.get_cash());
