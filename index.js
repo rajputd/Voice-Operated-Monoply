@@ -26,6 +26,7 @@ const GET_PLAYER_ACCOUNT_BALANCE_ACTION = 'get_player_account_balance';
 const GET_MY_PROPERTIES_ACTION = 'get_my_properties';
 const GET_PLAYER_PROPERTIES_ACTION = 'get_player_properties';
 const MORTGAGE_PROPERTY_ACTION = 'mortgage_property';
+const UNMORTGAGE_PROPERTY_ACTION = 'unmortgage_property';
 
 // the parameters that are parsed from the make_name intent 
 const NUM_PLAYERS_ARGUMENT = 'num_players';
@@ -49,6 +50,7 @@ app.post('/', function (request, response) {
 	actionMap.set(GET_MY_PROPERTIES_ACTION, get_my_properties);
 	actionMap.set(GET_PLAYER_PROPERTIES_ACTION, get_player_properties);
 	actionMap.set(MORTGAGE_PROPERTY_ACTION, mortgage_property);
+	actionMap.set(UNMORTGAGE_PROPERTY_ACTION, unmortgage_property);
 
 	app.handleRequest(actionMap);
 
@@ -140,4 +142,12 @@ function mortgage_property(app) {
 	//check if properties are already mortgaged
 	//mortgage given properties
 	app.ask('OK, I mortgaged ' + properties);
+}
+
+function unmortgage_property(app) {
+	var properties = app.getArgument(PROPERTIES_ARGUMENT);
+	//check if player owns those properties
+	//check if properties are mortgaged
+	//unmortgage those properties
+	app.ask('OK, I unmortgaged ' + properties);
 }
