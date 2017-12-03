@@ -24,6 +24,7 @@ const ROLL_DICE_ACTION = 'roll_dice';
 const GET_MY_ACCOUNT_BALANCE_ACTION = 'get_my_account_balance';
 const GET_PLAYER_ACCOUNT_BALANCE_ACTION = 'get_player_account_balance';
 const GET_MY_PROPERTIES_ACTION = 'get_my_properties';
+const GET_PLAYER_PROPERTIES_ACTION = 'get_player_properties';
 
 // the parameters that are parsed from the make_name intent 
 const NUM_PLAYERS_ARGUMENT = 'num_players';
@@ -44,6 +45,7 @@ app.post('/', function (request, response) {
 	actionMap.set(GET_MY_ACCOUNT_BALANCE_ACTION, get_my_account_balance);
 	actionMap.set(GET_PLAYER_ACCOUNT_BALANCE_ACTION, get_player_account_balance);
 	actionMap.set(GET_MY_PROPERTIES_ACTION, get_my_properties);
+	actionMap.set(GET_PLAYER_PROPERTIES_ACTION, get_player_properties);
 
 	app.handleRequest(actionMap);
 
@@ -113,6 +115,7 @@ function get_my_account_balance(app) {
 
 function get_player_account_balance(app) {
 	var player_name = app.getArgument(PLAYER_NAMES_ARGUMENT);
+	//check if it is a valid player name
 	//look up how much money they have.
 	app.ask(player_name + ' has $200.');
 }
@@ -120,4 +123,10 @@ function get_player_account_balance(app) {
 function get_my_properties(app) {
 	//get current player name
 	app.ask('you own park place');
+}
+
+function get_player_properties(app) {
+	var player_name = app.getArgument(PLAYER_NAMES_ARGUMENT);
+	//check if it is a valid player name
+	app.ask(player_name + ' owns vermont avenue.');
 }
