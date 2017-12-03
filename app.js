@@ -115,11 +115,9 @@ var chance14 = new board.Chance("advBoard", "Take a walk on the Boardwalk\n"
                                 + "Advance token to Boardwalk", "move");
 var chance15 = new board.Chance("goBack", "Go back 3 spaces", "move");
 
-var chanceCards = [chance0, chance1, chance2, chance3, chance4, chance5,
+var chanceCards = [chance3, chance1, chance2, chance0, chance4, chance5,
                    chance6, chance7, chance8, chance9, chance10, chance11,
                    chance12, chance13, chance14, chance15];
-
-var chanceDiscards = [];
 
 var chest0 = new board.Chest("hospital", "Pay hospital $100", "pay");
 var chest1 = new board.Chest("docFee", "Doctor's Fee\nPay $50", "pay");
@@ -147,10 +145,20 @@ var chestCards = [chest0, chest1, chest2, chest3, chest4, chest5, chest6,
                   chest7, chest8, chest9, chest10, chest11, chest12, chest13,
                   chest14, chest15];
 
-var chestDiscards = [];
-
 var player1 = new board.Player("Nick");
 var player2 = new board.Player("Dileep");
 var player3 = new board.Player("Ernie");
 
 var players = [player1, player2, player3];
+
+var diceSum = board.rollDice()[0];
+
+var newSpace = board.getNewSpace(player1, gameBoard, diceSum);
+
+//player1.add_property(BaltAve);
+
+//player1.set_space(7);
+//board.chanceAction(chance3, player1, players, gameBoard);
+
+//console.log(chanceCards);
+//board.movePlayer(player1, gameBoard, players, diceSum, space7, chanceCards, chestCards);

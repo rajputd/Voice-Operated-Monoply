@@ -28,7 +28,8 @@ module.exports = {
                 this.get_prop_list = function() {return this.properties;};
                 this.get_num_houses = function() {return this.numHouses;};
                 this.get_num_hotels = function() {return this.numHotels;};
-
+                this.get_num_railroads = function () {return this.numRailroads;};
+                this.get_num_utilities = function () {return this.numUtilites;};
 
                 //Setters
                 this.set_cash = function(cash) {this.cash = cash;};
@@ -50,6 +51,8 @@ module.exports = {
                 this.add_property = function(property) {this.properties.push(property);};
                 this.set_num_houses = function(number) {this.numHouses = number;};
                 this.set_num_hotels = function(number) {this.numHotels = number;};
+                this.set_num_railroads = function(number) {this.numRailroads = number;};
+                this.set_num_utilities = function(number) {this.numUtilites = number;};
         },
 
     //Probably tweaking this tomorrow
@@ -166,8 +169,122 @@ module.exports = {
               }
         },
 
+    // Calculate the net worth of a player. Doesn't handle houses and hotels, just yet.
+    getNetWorth: function(player){
+
+    	// Declares a variable to hold the player's net worth.
+    	var netWorth = 0;
+
+    	// Consider the player's current cash assets.
+    	netWorth += player.get_cash();
+
+    	// Iterate over all of the player's properties and add them to find the net worth.
+        for (index = 0; index < player.properties.length; index++) {
+
+            var properties = player.get_prop_list();
+
+        	// Consider the value of the property.
+            netWorth += properties[index].get_price();
+        	// Consider the value of any building on the property.
+
+        	// Add it to the player's total worth.
+        	netWorth += (properties[index].get_num_buildings()) * (properties[index].get_build_cost());
+
+                return netWorth;
+        }
+    },
+
+    // Mortage properties.
+    mortgageProperty: function(player, property){
+
+        // Easy way to refer to the properties a player has.
+        var properties = player.get_prop_list();
+
+        console.log("The player has " + player.get_cash() + ".");
+
+        // Check to see if the player actually owns the property in question.
+        if (properties.indexOf(property) > -1) {
+        	console.log("The player actually owns " + property.get_name() + ". Proceeding.");
+
+        	// Set's the properties status to be morgaged.
+        	property.set_mortgage_true();
+
+        	// Add the mortage price of the property to the player's cash.
+        	player.set_cash(player.get_cash() + property.get_mortgage_price());
+        	console.log("After, the player has " + player.get_cash() + ".");
+        }
+    },
+
+    unmortgageProperty: function(player, property){
+
+        // Easy way to refer to the properties a player has.
+        var properties = player.get_prop_list();
+
+        console.log("The player has " + player.get_cash() + ".");
+
+        // Check to see if the player actually owns the property in question.
+        if (properties.indexOf(property) > -1) {
+        	console.log("The player actually owns " + property.get_name() + ". Proceeding.");
+
+        	// Checks if the player actually has the cash to unmortage the property.
+        	if (player.get_cash() >= property.get_unmortgage_price()) {
+
+        	    // Set's the properties status to be unmortgaged.
+        	    property.set_mortgage_false();
+
+        	    // Add the mortage price of the property to the player's cash.
+        	    player.set_cash(player.get_cash() - property.get_unmortgage_price());
+        	    console.log("After the unmortage, the player has " + player.get_cash() + ".");
+        	}
+        }
+    },
+
+    // Jail function.
+    jail: function(player, chance, chest){
+
+        // Handles case 1, where the player directly lands on the space marked, "Go to Jail".
+        if (player.get_space() === 10) {
+
+        	// Move the player to jail.
+        	// movePlayer()
+
+        	// Assumes we pass Go, hack the do not collect $200 condition by letting the player collect $200,
+            // then immediately subtracting $200.
+        	if (player.get_space >= 10)
+        		player.set_cash(player.get_cash() - 200);
+        }
+
+        // Handles case 2, where the player draws a card marked "go to jail". Only two such cards exist, one in the chance deck and the other in the community chest deck.
+        if (chance.get_id() === jail || chest.get_id() == jail) {
+
+        	// Move the player to jail.
+        	// movePlayer()
+
+        	// Assumes we pass Go, hack the do not collect $200 condition by letting the player collect $200,
+            // then immediately subtracting $200.
+        	if (player.get_space >= 10)
+        		player.set_cash(player.get_cash() - 200);
+        }
+
+        // Handles case 3, where the player rolls 3 doubles in a roll.
+        if (doublesCount === 3) {
+
+        	// Reset the player's double count.
+        	doublesCount = 0;
+
+        	// Move the player to jail.
+        	// movePlayer()
+
+            // Assumes we pass Go, hack the do not collect $200 condition by letting the player collect $200,
+            // then immediately subtracting $200.
+        	if (player.get_space >= 10)
+        		player.set_cash(player.get_cash() - 200);
+        }
+
+    },
+
     //Finds action associated with passed chance card
-    chanceAction: function(card, currPlayer, players){
+    chanceAction: function(card, currPlayer, players, gameBoard){
 
         var id = card.get_id();
         var action = card.get_action();
@@ -228,12 +345,27 @@ module.exports = {
         }
 
         else if (action === "move"){
+
             if (id === "advGo"){
-                //Move to Go
-                //Trigger space action
+                module.exports.movePlayer(player, gameBoard, players, gameBoard[0]);
+                console.log("You landed on Go!");
+                //trigger go function
             }
 
             else if (id === "nearestRail1"){
+                var position = player.get_space();
+
+                console.log(position);
+
+                if (position === 7){
+                   module.exports.movePlayer(player, gameBoard, players, gameBoard[15]);
+                }
+                else if (position === 22)
+                   module.exports.movePlayer(player, gameBoard, players, gameBoard[25]);
+
+                else if (position === 36)
+                   module.exports.movePlayer(player, gameBoard, players, gameBoard[5]);
+
                 //Move to nearest railroad
                 //Pay owner 2x their rent
             }
@@ -377,40 +509,339 @@ module.exports = {
         }
     },
 
-    //Work in progress
-    propertyAction: function(space, currPlayer, players){
+    //Triggers when you land on a property space
+    propertySpace: function(space, currPlayer, players, diceSum){
         var space = space;
         var player = currPlayer;
         var property = space.get_prop();
-        var type = property.get_type();
+        var group = property.get_group();
+        var owner = property.get_owner();
 
-        if (type !== "utility" || type != "railroad"){
-            var numBuildings = property.get_num_buildings();
-            var monopoly = property.is_monopoly();
+        //If property is unowned
+        if (owner === undefined){
+            var price = property.get_price();
+            var cash = player.get_cash();
 
-            if (monopoly){
-                switch(numBuildings) {
-                    case 0:
+            //If player has enough to buy
+            if (cash >= price){
+                console.log("This property has no owner.");
+                console.log("You may buy it from the bank for $" + price + ",");
+                console.log("or put it up for auction.");
 
-}
+                //Not quite sure how to get answer from user here
+                //Dileep, you can decide how to get the answer
+                var answer = "buy";     //Setting manually for testing
+
+                if (answer === "buy"){
+
+                    if (group === "railroad")
+                        player.set_num_railroads(player.get_num_railroads() + 1);
+
+                    else if (group === "utility")
+                        player.set_num_utilities(player.get_num_utilities() + 1);
+
+                    player.set_cash(cash - price);
+                    property.set_owner(player);
+                    player.properties.push(property);
+                    console.log("You successfully purchased " + property.get_name()
+                            + " for " + "$" + price + ".");
+                    console.log("You now have $" + player.get_cash() + ".");
+
+                }
+
+                //Still feels really wonky. May want to scrap this
+                else if (answer === "auction"){
+                    console.log("Everyone may enter a bid.");
+                    console.log("Whoever makes the highest bid will pay that price for the property.");
+                    console.log("Let me know when the auction is over.");
+
+                    //Once bid is resolved, get purchaser and price
+                    var purchaser = players[1];         //Setting manually for testing, this input is a player object
+                    var i = players.indexOf(purchaser); //Find index of purchaser in players array
+
+                    var buyer = players[i]; //Now called buyer after finding player in array
+                    var price = 40;         //Setting manually for testing
+
+                    if (group === "railroad")
+                        buyer.set_num_railroads(player.get_num_railroads() + 1);
+
+                    else if (group === "utility")
+                        buyer.set_num_utilities(player.get_num_utilities() + 1);
+
+                    buyer.set_cash(cash - price);
+                    property.set_owner(buyer);
+                    buyer.properties.push(property);
+                    console.log(buyer.get_name() + " successfully purchased " + property.get_name()
+                            + " for " + "$" + price + ".");
+                    console.log(buyer.get_name() + " now has $" + buyer.get_cash() + ".");
+                }
             }
 
+            //if player has insufficient
+            else if (cash < price){
 
+                console.log("You need $" + (price-cash) + " purchase this property.");
+                console.log("You can sell buildings or mortgage properties to earn money,");
+                console.log(" or you can just put this property up for auction.");
+                console.log("Let me know if you want to buy or auction this property");
+
+               //Get buy or auction intent
+               var intent = "buy";
+
+               if (intent === "buy"){
+                   /* Call mortgage and sell buildings functions until
+                    * A. User has enought money to purchase property,
+                    * B. User has nothing left to sell, or
+                    * C. User changes mind and auctions
+                    *
+                    * If A, trigger normal buying logic and break when done
+                    * If B or C, change intent = "auction", and allow next case to take over
+                    */
+               }
+
+               else if (intent === "auction"){
+                    console.log("Everyone may enter a bid.");
+                    console.log("Whoever makes the highest bid will pay that price for the property.");
+                    console.log("Let me know when the auction is over.");
+
+                    //Once bid is resolved, get purchaser and price
+                    var purchaser = players[1];         //Setting manually for testing, this input is a player object
+                    var i = players.indexOf(purchaser); //Find index of purchaser in players array
+
+                    var buyer = players[i]; //Now called buyer after finding player in array
+                    var price = 40;         //Setting manually for testing
+
+                    if (group === "railroad")
+                        buyer.set_num_railroads(player.get_num_railroads() + 1);
+
+                    else if (group === "utility")
+                        buyer.set_num_utilities(player.get_num_utilities() + 1);
+
+                    buyer.set_cash(cash - price);
+                    property.set_owner(buyer);
+                    buyer.properties.push(property);
+                    console.log(buyer.get_name() + " successfully purchased " + property.get_name()
+                            + " for " + "$" + price + ".");
+                    console.log(buyer.get_name() + " now has $" + buyer.get_cash() + ".");
+                }
+            }
         }
 
+        else if (owner !== player){
+            var i = players.indexOf(owner);
+            owner = players[i];
 
+            console.log("This property is owned by " + owner.get_name() + ".");
+
+            var group = property.get_group();
+            var cash = player.get_cash();
+
+            console.log(group);
+
+            if (group === "railroad"){
+                var numRail = owner.get_num_railroads();
+                var rent;
+
+                switch (numRail){
+                    case 1:
+                        rent = 25;
+                        break;
+                    case 2:
+                        rent = 50;
+                        break;
+                    case 3:
+                        rent = 100;
+                        break;
+                    case 4:
+                        rent = 200;
+                        break;
+                }
+
+                if (cash >= rent){
+                        owner.set_cash(owner.get_cash() + rent);
+                        player.set_cash(player.get_cash() - rent);
+                        console.log("You payed " + owner.get_name() + " $" + rent);
+                        console.log("You now have $" + player.get_cash());
+                    }
+
+                else if (cash < rent){
+                        console.log("Sorry no money");
+                        /* trigger bankruptcy function
+                         * if player can't pay owner, player forfeits all
+                         * assets to owner
+                         */
+                    }
+            }
+
+            else if(group === "utility"){
+
+                var numUtil = owner.get_num_utilities();
+                var rent;
+
+                switch (numUtil){
+                    case 1:
+                        rent  = 4 * diceSum;
+                        break;
+                    case 2:
+                        rent  = 10 * diceSum;
+                        break;
+                }
+
+                if (cash >= rent){
+                        owner.set_cash(owner.get_cash() + rent);
+                        player.set_cash(player.get_cash() - rent);
+                        console.log("You payed " + owner.get_name() + " $" + rent);
+                        console.log("You now have $" + player.get_cash());
+                    }
+
+                else if (cash < rent){
+                        console.log("Sorry no money");
+                        /* trigger bankruptcy function
+                         * if player can't pay owner, player forfeits all
+                         * assets to owner
+                         */
+                    }
+            }
+
+            else{
+
+                var monopoly = property.is_monopoly();
+
+                if (monopoly){
+                    var numBuildings = property.get_num_buildings();
+                    var rent;
+
+                    switch (numBuildings){
+                        case 0:
+                            rent = property.get_rent0() * 2;
+                            break;
+                        case 1:
+                            rent = property.get_rent1();
+                            break;
+                        case 2:
+                            rent = property.get_rent2();
+                            break;
+                        case 3:
+                            rent = property.get_rent3();
+                            break;
+                        case 4:
+                            rent = property.get_rent4();
+                            break;
+                        case 5:
+                            rent = property.get_rent5();
+                            break;
+                    }
+
+                    if (cash >= rent){
+                        owner.set_cash(owner.get_cash() + rent);
+                        player.set_cash(player.get_cash() - rent);
+                        console.log("You payed " + owner.get_name() + " $" + rent);
+                        console.log("You now have $" + player.get_cash());
+                    }
+
+                    else if (cash < rent){
+                        console.log("You need an additional $" + rent - price);
+                        /* trigger bankruptcy function
+                         * if player can't pay owner, player forfeits all
+                         * assets to owner
+                         */
+                    }
+                }
+
+                else if (!monopoly){
+
+                   var rent = property.get_rent0();
+                    if (cash >= rent){
+                        owner.set_cash(owner.get_cash() + rent);
+                        player.set_cash(player.get_cash() - rent);
+                        console.log("You payed " + owner.get_name() + " $" + rent);
+                        console.log("You now have $" + player.get_cash());
+                    }
+
+                    else if (cash < rent){
+                        console.log("Sorry no money");
+                        /* trigger bankruptcy function
+                         * if player can't pay owner, player forfeits all
+                         * assets to owner
+                         */
+                    }
+                }
+            }
+        }
+
+        else
+            console.log("You own this property!");
+    },
+
+    actionSpace: function(space, currPlayer, players, gameBoard, chanceCards, chestCards){
+
+        var id = space.get_id();
+        var player = currPlayer;
+
+
+
+        if (id === "Go"){
+            //trigger Go function
+        }
+
+        else if (id === "CommChest1" || id === "CommChest2" || id === "CommChest3")
+            module.exports.drawChest(chestCards, player, players, gameBoard);
+
+        else if (id === "IncTax"){
+            var percent = .1 * module.exports.getNetWorth(player);
+
+            //We still need to check for bankruptcy somehwere in here
+
+            if (percent > 200){
+                console.log("10% of your net worth amounts to $" + percent + ".");
+                console.log("So we'll charge you $200 instead.");
+                player.set_cash(player.get_cash() - 200);
+            }
+
+            else{
+                console.log("10% of your net worth amounts to $" + percent + ".");
+                console.log("So we'll charge you that amount instead of $200.");
+                player.set_cash(player.get_cash() - percent);
+            }
+
+            console.log("You now have $" + player.get_cash() + ".");
+        }
+
+        else if (id === "Chance1" || id === "Chance2" || id === "Chance3")
+            module.exports.drawChance(chanceCards, player, players, gameBoard);
+
+        else if (id === "Jail"){
+            console.log("Move to jail.");
+            console.log("Don't worry, you're not in trouble! You're just visiting.");
+        }
+        else if (id === "Parking"){
+            console.log("Free Parking!");
+            console.log("Nothing to do here!");
+        }
+
+        else if (id === "GoToJail"){
+            console.log("Go to Jail. Go directly to Jail.");
+            console.log("Do not pass GO. Do not collect $200");
+        }
+
+        else if (id === "LuxTax"){
+            console.log("Luxury Tax. Pay $75");
+            player.set_cash(player.get_cash() - 75);
+            console.log("You now have $" + player.get_cash() + ".");
+        }
     },
 
     //Draw chance card from array and call chanceAction()
-    drawChance: function(chanceCards, currPlayer, players){
+    drawChance: function(chanceCards, currPlayer, players, board){
         var cards = chanceCards;
         var player = currPlayer;
         var players = players;
-
         var card = cards.shift();  //Remove and return first card in array
 
+        //console.log(cards);
+
         //Call chanceAction() function on card
-        module.exports.chanceAction(card, player, players);
+        module.exports.chanceAction(card, player, players, board);
 
         //GOTJ card is given to player, not immediately put at the end
         if (card.get_id() !== "getOutJail"){
@@ -419,7 +850,7 @@ module.exports = {
     },
 
     //Draw chest card from array and call chestAction()
-    drawChest: function(chestCards, currPlayer, players){
+    drawChest: function(chestCards, currPlayer, players, board){
         var cards = chestCards;
         var player = currPlayer;
         var players = players;
@@ -427,7 +858,7 @@ module.exports = {
         var card = cards.shift();  //Remove and return first card in array
 
         //Call chestAction() function on card
-        module.exports.chestAction(card, player, players);
+        module.exports.chestAction(card, player, players, board);
 
         //GOTJ card is given to player, not immediately put at the end
         if (card.get_id() !== "getOutJail"){
@@ -448,5 +879,42 @@ module.exports = {
             doubles = true;
 
         return [sum, doubles];
+    },
+
+    getNewSpace: function(player, board, diceSum){
+
+        var currPos = player.get_space();
+        var currSpace = board[currPos]; //Current space id
+
+        var newPos = currPos + diceSum;
+        var newSpace;
+
+        if (newPos > 39)
+            newSpace = board[newPos - currPos];
+
+        else
+            newSpace = board[newPos];
+
+        return newSpace;
+    },
+
+    //Move player to spaceNum and trigger space action
+    movePlayer: function(player, board, players, diceSum, newSpace, chanceCards, chestCards){
+
+        var currPos = player.get_space();
+
+        if (board.indexOf(newSpace) < currPos){
+                //trigger Go function
+            }
+
+        if (newSpace.get_type() === "Property"){
+            player.set_space(board.indexOf(newSpace));
+            module.exports.propertySpace(newSpace, player, players, diceSum);
+        }
+
+        else{
+            player.set_space(board.indexOf(newSpace));
+            module.exports.actionSpace(newSpace, player, players, board, chanceCards, chestCards);
+        }
     }
 };
