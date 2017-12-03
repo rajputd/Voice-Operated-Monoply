@@ -25,10 +25,12 @@ const GET_MY_ACCOUNT_BALANCE_ACTION = 'get_my_account_balance';
 const GET_PLAYER_ACCOUNT_BALANCE_ACTION = 'get_player_account_balance';
 const GET_MY_PROPERTIES_ACTION = 'get_my_properties';
 const GET_PLAYER_PROPERTIES_ACTION = 'get_player_properties';
+const MORTGAGE_PROPERTY_ACTION = 'mortgage_property';
 
 // the parameters that are parsed from the make_name intent 
 const NUM_PLAYERS_ARGUMENT = 'num_players';
 const PLAYER_NAMES_ARGUMENT = 'player';
+const PROPERTIES_ARGUMENT = 'properties';
 
 
 app.post('/', function (request, response) {
@@ -46,6 +48,7 @@ app.post('/', function (request, response) {
 	actionMap.set(GET_PLAYER_ACCOUNT_BALANCE_ACTION, get_player_account_balance);
 	actionMap.set(GET_MY_PROPERTIES_ACTION, get_my_properties);
 	actionMap.set(GET_PLAYER_PROPERTIES_ACTION, get_player_properties);
+	actionMap.set(MORTGAGE_PROPERTY_ACTION, mortgage_property);
 
 	app.handleRequest(actionMap);
 
@@ -129,4 +132,12 @@ function get_player_properties(app) {
 	var player_name = app.getArgument(PLAYER_NAMES_ARGUMENT);
 	//check if it is a valid player name
 	app.ask(player_name + ' owns vermont avenue.');
+}
+
+function mortgage_property(app) {
+	var properties = app.getArgument(PROPERTIES_ARGUMENT);
+	//check if player owns those properties
+	//check if properties are already mortgaged
+	//mortgage given properties
+	app.ask('OK, I mortgaged ' + properties);
 }
