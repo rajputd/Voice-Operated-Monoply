@@ -115,7 +115,7 @@ var chance14 = new board.Chance("advBoard", "Take a walk on the Boardwalk\n"
                                 + "Advance token to Boardwalk", "move");
 var chance15 = new board.Chance("goBack", "Go back 3 spaces", "move");
 
-var chanceCards = [chance3, chance1, chance2, chance0, chance4, chance5,
+var chanceCards = [chance0, chance1, chance2, chance3, chance4, chance5,
                    chance6, chance7, chance8, chance9, chance10, chance11,
                    chance12, chance13, chance14, chance15];
 
@@ -155,10 +155,10 @@ var diceSum = board.rollDice()[0];
 
 var newSpace = board.getNewSpace(player1, gameBoard, diceSum);
 
-//player1.add_property(BaltAve);
+player1.add_property(BaltAve);
 
 //player1.set_space(7);
-//board.chanceAction(chance3, player1, players, gameBoard);
+//board.chestAction(chest13, player1, players, gameBoard);
 
 //console.log(chanceCards);
-//board.movePlayer(player1, gameBoard, players, diceSum, space7, chanceCards, chestCards);
+board.movePlayer(player1, gameBoard, players, diceSum, space2, chanceCards, chestCards);

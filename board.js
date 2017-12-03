@@ -347,73 +347,89 @@ module.exports = {
         else if (action === "move"){
 
             if (id === "advGo"){
-                module.exports.movePlayer(player, gameBoard, players, gameBoard[0]);
+                module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[0]);
                 console.log("You landed on Go!");
                 //trigger go function
             }
 
+            //Need to pay owner 2x rent if already owned
             else if (id === "nearestRail1"){
                 var position = player.get_space();
 
-                console.log(position);
-
                 if (position === 7){
-                   module.exports.movePlayer(player, gameBoard, players, gameBoard[15]);
-                }
+                   module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[15]);
+
+
+               }
+
                 else if (position === 22)
-                   module.exports.movePlayer(player, gameBoard, players, gameBoard[25]);
+                   module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[25]);
 
                 else if (position === 36)
-                   module.exports.movePlayer(player, gameBoard, players, gameBoard[5]);
+                   module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[5]);
 
                 //Move to nearest railroad
                 //Pay owner 2x their rent
             }
 
             else if (id === "nearestUtil"){
-                //Move to nearest utility
-                //Roll dice and pay owner 10x that amount
+                var position = player.get_space();
+
+                console.log(position);
+
+                if (position === 7)
+                   module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[12]);
+
+                else if (position === 22)
+                   module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[28]);
+
+                else if (position === 36)
+                   module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[12]);
             }
 
-            else if (id === "advStChar"){
-                //Move to St. Charles Place
-                //Trigger space action
-            }
+            else if (id === "advStChar")
+                module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[11]);
 
             else if (id === "goToJail"){
                 //Move to Jail
                 //Set player inJail to true
             }
 
-            else if (id === "readRail"){
-                //Move to Reading Railroad
-                //Trigger space action
-            }
+            else if (id === "readRail")
+                module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[5]);
 
             else if (id === "nearestRail2"){
+                var position = player.get_space();
+
+                if (position === 7)
+                   module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[15]);
+
+                else if (position === 22)
+                   module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[25]);
+
+                else if (position === 36)
+                   module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[5]);
+
                 //Move to nearest railroad
                 //Pay owner 2x their rent
             }
 
-            else if (id === "advIllinois"){
-                //Move to Illinois Avenue
-                //Trigger space action
-            }
+            else if (id === "advIllinois")
+                module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[24]);
 
-            else if (id === "advBoard"){
-                //Move to Boardwalk
-                //Trigger space action
-            }
+            else if (id === "advBoard")
+                module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[39]);
 
             else if (id === "goBack"){
                 //Move player back 3 spaces
-                //Trigger space action
+                //Needs to override Go function
+                //I'll flesh this out tomorrow (12/3)
             }
         }
     },
 
     //Finds action associated with passed chest card
-    chestAction: function(card, currPlayer, players){
+    chestAction: function(card, currPlayer, players, gameBoard){
 
         var id = card.get_id();
         var action = card.get_action();
@@ -498,13 +514,13 @@ module.exports = {
         }
 
         else if (action === "move"){
-            if (card === "goToJail"){
+            if (id === "goToJail"){
                 //Move player to jail
             }
 
-            else if (card === "advGo"){
-                //Move player to jail
-                //Collect $200
+            else if (id === "advGo"){
+                module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[0]);
+                console.log("You landed on Go!");
             }
         }
     },
@@ -635,8 +651,6 @@ module.exports = {
 
             var group = property.get_group();
             var cash = player.get_cash();
-
-            console.log(group);
 
             if (group === "railroad"){
                 var numRail = owner.get_num_railroads();
