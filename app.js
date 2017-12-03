@@ -151,14 +151,16 @@ var player3 = new board.Player("Ernie");
 
 var players = [player1, player2, player3];
 
-var diceSum = board.rollDice()[0];
+board.shuffleArray(chanceCards);
+board.shuffleArray(chestCards);
+
+var diceSum = board.rollDice()[0];      //Total of dice roll
+var doubles = board.rollDice()[1];      //Doubles boolean
 
 var newSpace = board.getNewSpace(player1, gameBoard, diceSum);
 
-player1.add_property(BaltAve);
-
-//player1.set_space(7);
-//board.chestAction(chest13, player1, players, gameBoard);
+player1.give_chanceJail();
+player1.set_jail_turn(1);
 
 //console.log(chanceCards);
-board.movePlayer(player1, gameBoard, players, diceSum, space2, chanceCards, chestCards);
+board.movePlayer(player1, gameBoard, players, diceSum, space30, chanceCards, chestCards);

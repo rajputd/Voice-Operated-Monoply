@@ -10,7 +10,7 @@ module.exports = {
 
                 this.chanceJail = false;    //Does player have gotj card?
                 this.chestJail = false;     //Does player have gotj card?
-                this.inJail = false;        //Is player in jail?
+                this.jailTurn = 0;         //How many turns has the player been in jail?
                 this.properties = [];       //Array of player-owned properties
                 this.numHouses = 0;         //# houses owned (for chance and chest cards)
                 this.numHotels = 0;         //# hotels owned (for chance and chest cards)
@@ -24,7 +24,7 @@ module.exports = {
                 this.get_turn = function() {return this.turn;};
                 this.get_chanceJail = function() {return this.chanceJail;};
                 this.get_chestJail = function() {return this.chestJail;};
-                this.get_inJail = function() {return this.inJail;};
+                this.get_jail_turn = function() {return this.jailTurn;};
                 this.get_prop_list = function() {return this.properties;};
                 this.get_num_houses = function() {return this.numHouses;};
                 this.get_num_hotels = function() {return this.numHotels;};
@@ -40,8 +40,7 @@ module.exports = {
                 this.take_chestJail = function() {this.chestJail = false;};
                 this.give_chanceJail = function() {this.chanceJail = true;};
                 this.give_chestJail = function() {this.chestJail = true;};
-                this.go_inJail = function() {this.turn = true;};
-                this.leave_inJail = function() {this.turn = false;};
+                this.set_jail_turn = function(number) {this.jailTurn = number;};
                 this.remove_property = function(property) {
                     var i = this.properties.indexOf(property);
                         if(i !== -1) {
@@ -239,52 +238,281 @@ module.exports = {
         }
     },
 
-    // Jail function.
-    jail: function(player, chance, chest){
+    // Jail function
+    jail: function(currPlayer, board, players, chanceCards, chestCards){
 
-        // Handles case 1, where the player directly lands on the space marked, "Go to Jail".
-        if (player.get_space() === 10) {
+        var player = currPlayer;
+        player.set_space(10);
 
-        	// Move the player to jail.
-        	// movePlayer()
+        var chanceJail = player.get_chanceJail();
+        var chestJail = player.get_chestJail();
+        var jailTurn = player.get_jail_turn();
 
-        	// Assumes we pass Go, hack the do not collect $200 condition by letting the player collect $200,
-            // then immediately subtracting $200.
-        	if (player.get_space >= 10)
-        		player.set_cash(player.get_cash() - 200);
+        //This will trigger when you are sent to jail via 1/3 options
+        if (jailTurn === 0){
+            console.log("You have been sent to jail. Ending your turn.");
+            player.set_jail_turn(1);
         }
 
-        // Handles case 2, where the player draws a card marked "go to jail". Only two such cards exist, one in the chance deck and the other in the community chest deck.
-        if (chance.get_id() === jail || chest.get_id() == jail) {
+        //This should be triggered when a player want
+        else if (jailTurn === 1){
+            console.log("You are in jail, so you won't be able to move until you are free.");
+            console.log("You can get out immediately if you roll doubles,");
+            console.log("or you can pay $50 and get out next turn.");
+            console.log("If you fail to roll doubles on your third attempt, you will still have to pay $50.");
 
-        	// Move the player to jail.
-        	// movePlayer()
+            if (chanceJail || chestJail)
+                console.log("You could also use your \"Get out of Jail Free\" card.");
 
-        	// Assumes we pass Go, hack the do not collect $200 condition by letting the player collect $200,
-            // then immediately subtracting $200.
-        	if (player.get_space >= 10)
-        		player.set_cash(player.get_cash() - 200);
+            console.log("How do you want to get out?\n");
+
+            //Response from DialogFlow should be "roll dice", "pay fine", "use card"
+            var answer = "roll";     //For testing
+
+            if (answer === "pay"){
+                player.set_cash(player.get_cash() - 50);
+                player.set_jail_turn(0);
+                console.log("You have been released. Move to the \"Just Vistiing\" section. Ending your turn.");
+            }
+
+            else if (answer === "card"){
+
+                var diceSum = module.exports.rollDice()[0];
+                var doubles = module.exports.rollDice()[1];
+
+                if (chanceJail){
+                    player.take_chanceJail();
+                    newSpace = module.exports.getNewSpace(player, board, diceSum);
+                    player.set_jail_turn(0);
+                    console.log("Please return your card to the board.");
+                    module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                }
+
+                else if (chestJail){
+                    player.take_chestJail();
+                    newSpace = module.exports.getNewSpace(player, board, diceSum);
+                    player.set_jail_turn(0);
+                    console.log("Please return your card to the board.");
+                    module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                }
+
+                else if (chestJail && chanceJail){
+                    console.log("Which card would you like to use?");
+
+                    //Need response from DialogFlow
+                    var card = "chance";    //For testing
+
+                    console.log("Please return your card to the board.");
+
+                    if (card === "chance"){
+                        player.take_chanceJail();
+                        newSpace = module.exports.getNewSpace(player, board, diceSum);
+                        player.set_jail_turn(0);
+                        module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                    }
+
+                    else if (card === "chest"){
+                        player.take_chestJail();
+                        newSpace = module.exports.getNewSpace(player, board, diceSum);
+                        player.set_jail_turn(0);
+                        module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                    }
+                }
+            }
+
+            else if (answer === "roll"){
+                var diceSum = module.exports.rollDice()[0];
+                var doubles = module.exports.rollDice()[1];
+
+                //If doubles are rolled, immediately move out, but don't let roll again.
+                if (doubles){
+                    newSpace = module.exports.getNewSpace(player, board, diceSum);
+                    console.log("You rolled doubles!\n");
+                    player.set_jail_turn(0);
+                    module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                }
+
+                else{
+                    console.log("Sorry, you did not roll doubles. Ending your turn.");
+                    player.set_jail_turn(2);
+                }
+            }
         }
 
-        // Handles case 3, where the player rolls 3 doubles in a roll.
-        if (doublesCount === 3) {
+        else if (jailTurn === 2){
+            console.log("You are in jail, so you won't be able to move until you are free.");
+            console.log("You can get out immediately if you roll doubles,");
+            console.log(" or you can pay $50 and get out next turn.");
+            console.log("If you fail to roll doubles on your third attempt, you will still have to pay $50.");
 
-        	// Reset the player's double count.
-        	doublesCount = 0;
+            if (chanceJail || chestJail)
+                console.log("You could also use your \"Get out of Jail Free\" card.");
 
-        	// Move the player to jail.
-        	// movePlayer()
+            console.log("How do you want to get out?");
 
-            // Assumes we pass Go, hack the do not collect $200 condition by letting the player collect $200,
-            // then immediately subtracting $200.
-        	if (player.get_space >= 10)
-        		player.set_cash(player.get_cash() - 200);
+            //Response from DialogFlow should be "roll dice", "pay fine", "use card"
+            var answer = "pay";     //For testing
+
+            if (answer === "pay"){
+                player.set_cash(player.get_cash() - 50);
+                player.set_jail_turn(0);
+                console.log("You have been released. Move to the \"Just Vistiing\" section. Ending your turn.");
+            }
+
+            else if (answer === "card"){
+
+                var diceSum = module.exports.rollDice()[0];
+                var doubles = module.exports.rollDice()[1];
+
+                if (chanceJail){
+                    player.take_chanceJail();
+                    newSpace = module.exports.getNewSpace(player, board, diceSum);
+                    player.set_jail_turn(0);
+                    console.log("Please return your card to the board.");
+                    module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                }
+
+                else if (chestJail){
+                    player.take_chestJail();
+                    newSpace = module.exports.getNewSpace(player, board, diceSum);
+                    player.set_jail_turn(0);
+                    console.log("Please return your card to the board.");
+                    module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                }
+
+                else if (chestJail && chanceJail){
+                    console.log("Which card would you like to use?");
+
+                    //Need response from DialogFlow
+                    var card = "chance";    //For testing
+
+                    console.log("Please return your card to the board.");
+
+                    if (card === "chance"){
+                        player.take_chanceJail();
+                        newSpace = module.exports.getNewSpace(player, board, diceSum);
+                        player.set_jail_turn(0);
+                        module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                    }
+
+                    else if (card === "chest"){
+                        player.take_chestJail();
+                        newSpace = module.exports.getNewSpace(player, board, diceSum);
+                        player.set_jail_turn(0);
+                        module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                    }
+                }
+            }
+
+            else if (answer === "roll"){
+                var diceSum = module.exports.rollDice()[0];
+                var doubles = module.exports.rollDice()[1];
+
+                //If doubles are rolled, immediately move out, but don't let roll again.
+                if (doubles){
+                    newSpace = module.exports.getNewSpace(player, board, diceSum);
+                    console.log("You rolled doubles!");
+                    player.set_jail_turn(0);
+                    module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                }
+
+                else{
+                    console.log("Sorry, you did not roll doubles. Ending your turn.");
+                    player.set_jail_turn(3);
+                }
+            }
         }
 
+        else if (jailTurn === 3){
+
+            console.log("This is your last turn in Jail.");
+            console.log("You can try to role doubles one more time, ");
+            console.log("but if you fail to do so, you'll have to pay the $50.");
+
+            if (chanceJail || chestJail)
+                console.log("You could also use your \"Get out of Jail Free\" card.");
+
+            console.log("How do you want to get out?");
+
+            //Response from DialogFlow should be "roll dice", "use card"
+            var answer = "roll";     //For testing
+
+            if (answer === "pay"){
+                player.set_cash(player.get_cash() - 50);
+                player.set_jail_turn(0);
+                console.log("You have been released. Move to the \"Just Vistiing\" space. Ending your turn.");
+            }
+
+            else if (answer === "card"){
+
+                var diceSum = module.exports.rollDice()[0];
+                var doubles = module.exports.rollDice()[1];
+
+                if (chanceJail){
+                    player.take_chanceJail();
+                    newSpace = module.exports.getNewSpace(player, board, diceSum);
+                    player.set_jail_turn(0);
+                    console.log("Please return your card to the board.");
+                    module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                }
+
+                else if (chestJail){
+                    player.take_chestJail();
+                    newSpace = module.exports.getNewSpace(player, board, diceSum);
+                    player.set_jail_turn(0);
+                    console.log("Please return your card to the board.");
+                    module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                }
+
+                else if (chestJail && chanceJail){
+                    console.log("Which card would you like to use?");
+
+                    //Need response from DialogFlow
+                    var card = "chance";    //For testing
+
+                    console.log("Please return your card to the board.");
+
+                    if (card === "chance"){
+                        player.take_chanceJail();
+                        newSpace = module.exports.getNewSpace(player, board, diceSum);
+                        player.set_jail_turn(0);
+                        module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                    }
+
+                    else if (card === "chest"){
+                        player.take_chestJail();
+                        newSpace = module.exports.getNewSpace(player, board, diceSum);
+                        player.set_jail_turn(0);
+                        module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                    }
+                }
+            }
+
+            else if (answer === "roll"){
+                var diceSum = module.exports.rollDice()[0];
+                var doubles = module.exports.rollDice()[1];
+
+                //If doubles are rolled, immediately move out, but don't let roll again.
+                if (doubles){
+                    newSpace = module.exports.getNewSpace(player, board, diceSum);
+                    console.log("You rolled doubles!");
+                    player.set_jail_turn(0);
+                    module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                }
+
+                else{
+                    console.log("Sorry, you did not roll doubles. You must pay $50, and move according to the dice.");
+                    newSpace = module.exports.getNewSpace(player, board, diceSum);
+                    player.set_cash(player.get_cash() - 50);
+                    player.set_jail_turn(0);
+                    module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
+                }
+            }
+        }
     },
 
     //Finds action associated with passed chance card
-    chanceAction: function(card, currPlayer, players, gameBoard){
+    chanceAction: function(card, currPlayer, players, gameBoard, chanceCards, chestCards){
 
         var id = card.get_id();
         var action = card.get_action();
@@ -390,10 +618,8 @@ module.exports = {
             else if (id === "advStChar")
                 module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[11]);
 
-            else if (id === "goToJail"){
-                //Move to Jail
-                //Set player inJail to true
-            }
+            else if (id === "goToJail")
+                module.exports.jail(player, gameBoard, players, chanceCards, chestCards);
 
             else if (id === "readRail")
                 module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[5]);
@@ -429,7 +655,7 @@ module.exports = {
     },
 
     //Finds action associated with passed chest card
-    chestAction: function(card, currPlayer, players, gameBoard){
+    chestAction: function(card, currPlayer, players, gameBoard, chanceCards, chestCards){
 
         var id = card.get_id();
         var action = card.get_action();
@@ -514,9 +740,8 @@ module.exports = {
         }
 
         else if (action === "move"){
-            if (id === "goToJail"){
-                //Move player to jail
-            }
+            if (id === "goToJail")
+                module.exports.jail(player, gameBoard, players, chanceCards, chestCards);
 
             else if (id === "advGo"){
                 module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[0]);
@@ -792,14 +1017,12 @@ module.exports = {
         var id = space.get_id();
         var player = currPlayer;
 
-
-
         if (id === "Go"){
             //trigger Go function
         }
 
         else if (id === "CommChest1" || id === "CommChest2" || id === "CommChest3")
-            module.exports.drawChest(chestCards, player, players, gameBoard);
+            module.exports.drawChest(chestCards, player, players, gameBoard, chanceCards);
 
         else if (id === "IncTax"){
             var percent = .1 * module.exports.getNetWorth(player);
@@ -822,12 +1045,11 @@ module.exports = {
         }
 
         else if (id === "Chance1" || id === "Chance2" || id === "Chance3")
-            module.exports.drawChance(chanceCards, player, players, gameBoard);
+            module.exports.drawChance(chanceCards, player, players, gameBoard, chestCards);
 
-        else if (id === "Jail"){
-            console.log("Move to jail.");
+        else if (id === "Jail")
             console.log("Don't worry, you're not in trouble! You're just visiting.");
-        }
+
         else if (id === "Parking"){
             console.log("Free Parking!");
             console.log("Nothing to do here!");
@@ -835,7 +1057,8 @@ module.exports = {
 
         else if (id === "GoToJail"){
             console.log("Go to Jail. Go directly to Jail.");
-            console.log("Do not pass GO. Do not collect $200");
+            console.log("Do not pass GO. Do not collect $200\n");
+            module.exports.jail(player, gameBoard, players, chanceCards, chestCards);
         }
 
         else if (id === "LuxTax"){
@@ -846,16 +1069,16 @@ module.exports = {
     },
 
     //Draw chance card from array and call chanceAction()
-    drawChance: function(chanceCards, currPlayer, players, board){
+    drawChance: function(chanceCards, currPlayer, players, board, chestCards){
         var cards = chanceCards;
         var player = currPlayer;
         var players = players;
         var card = cards.shift();  //Remove and return first card in array
 
-        //console.log(cards);
+        console.log("Drawing Chance card:\n");
 
         //Call chanceAction() function on card
-        module.exports.chanceAction(card, player, players, board);
+        module.exports.chanceAction(card, player, players, board, chanceCards, chestCards);
 
         //GOTJ card is given to player, not immediately put at the end
         if (card.get_id() !== "getOutJail"){
@@ -864,15 +1087,17 @@ module.exports = {
     },
 
     //Draw chest card from array and call chestAction()
-    drawChest: function(chestCards, currPlayer, players, board){
+    drawChest: function(chestCards, currPlayer, players, board, chanceCards){
         var cards = chestCards;
         var player = currPlayer;
         var players = players;
 
+        console.log("Drawing Community Chest card:\n");
+
         var card = cards.shift();  //Remove and return first card in array
 
         //Call chestAction() function on card
-        module.exports.chestAction(card, player, players, board);
+        module.exports.chestAction(card, player, players, board, chanceCards, chestCards);
 
         //GOTJ card is given to player, not immediately put at the end
         if (card.get_id() !== "getOutJail"){
@@ -916,6 +1141,7 @@ module.exports = {
     movePlayer: function(player, board, players, diceSum, newSpace, chanceCards, chestCards){
 
         var currPos = player.get_space();
+        console.log("Move your piece to " + newSpace.get_name() + ".\n");
 
         if (board.indexOf(newSpace) < currPos){
                 //trigger Go function
