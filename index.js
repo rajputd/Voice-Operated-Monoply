@@ -29,6 +29,7 @@ const MORTGAGE_PROPERTY_ACTION = 'mortgage_property';
 const UNMORTGAGE_PROPERTY_ACTION = 'unmortgage_property';
 const GET_PROPERTY_OWNER_ACTION = 'get_property_owner';
 const BUILD_HOUSE_ACTION = 'build_house';
+const BUILD_HOTEL_ACTION = 'build_hotel';
 
 // the parameters that are parsed from the make_name intent 
 const NUM_PLAYERS_ARGUMENT = 'num_players';
@@ -56,6 +57,7 @@ app.post('/', function (request, response) {
 	actionMap.set(UNMORTGAGE_PROPERTY_ACTION, unmortgage_property);
 	actionMap.set(GET_PROPERTY_OWNER_ACTION, get_property_owner);
 	actionMap.set(BUILD_HOUSE_ACTION, build_house);
+	actionMap.set(BUILD_HOTEL_ACTION, build_hotel);
 
 	app.handleRequest(actionMap);
 
@@ -170,4 +172,11 @@ function build_house(app) {
 	//check if user owns that property
 	//buy the house and add it to said property
 	app.ask('you built ' + house_number + ' houses on ' + properties);
+}
+
+function build_hotel(app) {
+	var properties = app.getArgument(PROPERTIES_ARGUMENT);
+	//check if user owns the property
+	//buy the hotel if the the user
+	app.ask('you built a hotel on ' + properties);
 }
