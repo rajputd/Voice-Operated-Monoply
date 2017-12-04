@@ -542,8 +542,48 @@ module.exports = {
 
     },
 
+    explainJail: function(player){
+
+        var msg = '';
+        var chanceJail = player.get_chanceJail();
+        var chestJail = player.get_chestJail();
+        var jailTurn = player.get_jail_turn();
+
+        if (jailTurn === 1){
+            console.log("You are in jail, so you won't be able to move until you are free."); msg += "You are in jail, so you won't be able to move until you are free.";
+            console.log("You can get out immediately if you roll doubles,"); msg += "You can get out immediately if you roll doubles,";
+            console.log("or you can pay $50 and move next turn."); msg += "or you can pay $50 and move next turn.";
+            console.log("If you fail to roll doubles on your third attempt, you will still have to pay $50."); msg += "If you fail to roll doubles on your third attempt, you will still have to pay $50.";
+
+            if (chanceJail || chestJail) {
+                console.log("You could also use your \"Get out of Jail Free\" card."); msg += "You could also use your \"Get out of Jail Free\" card.";
+            }
+        }
+
+        else if (jailTurn === 2){
+            console.log("You are still in jail."); msg += "You are still in jail.";
+            console.log("You can try to roll doubles, or you can pay $50 and get out next turn."); msg += "You can try to roll doubles, or you can pay $50 and get out next turn.";
+
+            if (chanceJail || chestJail) {
+                console.log("You could also use your \"Get out of Jail Free\" card."); msg += "You could also use your \"Get out of Jail Free\" card.";
+            }
+        }
+
+        else if (jailTurn === 3){
+
+            console.log("This is your last turn in Jail."); msg += "This is your last turn in Jail.";
+            console.log("You can try to role doubles one more time, "); msg += "You can try to role doubles one more time, ";
+            console.log("but if you fail to do so, you'll have to pay the $50."); msg += "but if you fail to do so, you'll have to pay the $50.";
+
+            if (chanceJail || chestJail) {
+                console.log("You could also use your \"Get out of Jail Free\" card."); msg += "You could also use your \"Get out of Jail Free\" card.";
+            }
+        }
+        return msg;
+    },
+
     // Jail function
-    jail: function(currPlayer, board, players, chanceCards, chestCards){
+    jail: function(currPlayer, board, players, chanceCards, chestCards, answer){
 
         var msg = '';
 
@@ -562,19 +602,6 @@ module.exports = {
 
         //This should be triggered when a player want
         else if (jailTurn === 1){
-            console.log("You are in jail, so you won't be able to move until you are free."); msg += "You are in jail, so you won't be able to move until you are free.";
-            console.log("You can get out immediately if you roll doubles,"); msg += "You can get out immediately if you roll doubles,";
-            console.log("or you can pay $50 and move next turn."); msg += "or you can pay $50 and move next turn.";
-            console.log("If you fail to roll doubles on your third attempt, you will still have to pay $50."); msg += "If you fail to roll doubles on your third attempt, you will still have to pay $50.";
-
-            if (chanceJail || chestJail) {
-                console.log("You could also use your \"Get out of Jail Free\" card."); msg += "You could also use your \"Get out of Jail Free\" card.";
-            }
-
-            console.log("How do you want to get out?\n"); msg += "How do you want to get out?\n";
-
-            //Response from DialogFlow should be "roll dice", "pay fine", "use card"
-            var answer = "roll";     //For testing
 
             if (answer === "pay"){
 
@@ -654,19 +681,6 @@ module.exports = {
         }
 
         else if (jailTurn === 2){
-            console.log("You are in jail, so you won't be able to move until you are free."); msg += "You are in jail, so you won't be able to move until you are free.";
-            console.log("You can get out immediately if you roll doubles,"); msg += "You can get out immediately if you roll doubles,";
-            console.log(" or you can pay $50 and get out next turn."); msg += " or you can pay $50 and get out next turn.";
-            console.log("If you fail to roll doubles on your third attempt, you will still have to pay $50."); msg += "If you fail to roll doubles on your third attempt, you will still have to pay $50.";
-
-            if (chanceJail || chestJail) {
-                console.log("You could also use your \"Get out of Jail Free\" card."); msg += "You could also use your \"Get out of Jail Free\" card.";
-            }
-
-            console.log("How do you want to get out?"); msg += "How do you want to get out?";
-
-            //Response from DialogFlow should be "roll dice", "pay fine", "use card"
-            var answer = "pay";     //For testing
 
             if (answer === "pay"){
 
@@ -746,19 +760,6 @@ module.exports = {
         }
 
         else if (jailTurn === 3){
-
-            console.log("This is your last turn in Jail."); msg += "This is your last turn in Jail.";
-            console.log("You can try to role doubles one more time, "); msg += "You can try to role doubles one more time, ";
-            console.log("but if you fail to do so, you'll have to pay the $50."); msg += "but if you fail to do so, you'll have to pay the $50.";
-
-            if (chanceJail || chestJail) {
-                console.log("You could also use your \"Get out of Jail Free\" card."); msg += "You could also use your \"Get out of Jail Free\" card.";
-            }
-
-            console.log("How do you want to get out?"); msg += "How do you want to get out?";
-
-            //Response from DialogFlow should be "roll dice", "use card"
-            var answer = "roll";     //For testing
 
             if (answer === "pay"){
 
@@ -1276,7 +1277,7 @@ module.exports = {
                         owner.set_cash(owner.get_cash() + rent);
                         player.set_cash(player.get_cash() - rent);
                         console.log("You payed " + owner.get_name() + " $" + rent); msg += "You payed " + owner.get_name() + " $" + rent;
-                        console.log("You now have $" + player.get_cash()); msg += "You now have $" + player.get_cash())
+                        console.log("You now have $" + player.get_cash()); msg += "You now have $" + player.get_cash();
                     }
 
                     else if (cash < rent){
