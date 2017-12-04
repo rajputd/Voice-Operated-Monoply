@@ -201,54 +201,67 @@ module.exports = {
 
         // Easy way to refer to the properties a player has.
         var properties = player.get_prop_list();
+        var mortgaged = property.is_mortgaged();
 
-        console.log("The player has " + player.get_cash() + ".");
+        if (mortgaged){
+            console.log("This property is already mortgaged.");
+            return;
+        }
 
         // Check to see if the player actually owns the property in question.
         if (properties.indexOf(property) > -1) {
-        	console.log("The player actually owns " + property.get_name() + ". Proceeding.");
-
         	// Set's the properties status to be morgaged.
         	property.set_mortgage_true();
 
         	// Add the mortage price of the property to the player's cash.
         	player.set_cash(player.get_cash() + property.get_mortgage_price());
-        	console.log("After, the player has " + player.get_cash() + ".");
+                console.log("You mortgaged + " + property.get_name() + " for $" + property.get_mortgage_price() + ".");
+        	console.log("You now have $" + player.get_cash() + ".");
         }
+
+        else
+            console.log("You do not own " + property.get_name + ". Cancelling mortgage.");
     },
 
     unmortgageProperty: function(player, property){
 
         // Easy way to refer to the properties a player has.
         var properties = player.get_prop_list();
+        var mortgaged = property.is_mortgaged();
 
-        console.log("The player has " + player.get_cash() + ".");
+        if (!mortgaged){
+            console.log("This property is not mortgaged, so there's no need to unmortgage it.");
+            return;
+        }
 
         // Check to see if the player actually owns the property in question.
         if (properties.indexOf(property) > -1) {
-        	console.log("The player actually owns " + property.get_name() + ". Proceeding.");
+        	// Set's the properties status to be morgaged.
+        	property.set_mortgage_false();
 
-        	// Checks if the player actually has the cash to unmortage the property.
-        	if (player.get_cash() >= property.get_unmortgage_price()) {
-
-        	    // Set's the properties status to be unmortgaged.
-        	    property.set_mortgage_false();
-
-        	    // Add the mortage price of the property to the player's cash.
-        	    player.set_cash(player.get_cash() - property.get_unmortgage_price());
-        	    console.log("After the unmortage, the player has " + player.get_cash() + ".");
-        	}
+        	// Add the mortage price of the property to the player's cash.
+        	player.set_cash(player.get_cash() - property.get_unmortgage_price());
+                console.log("You unmortgaged + " + property.get_name() + " for $" + property.get_mortgage_price() + ".");
+        	console.log("You now have $" + player.get_cash() + ".");
         }
+
+        else
+            console.log("You do not own " + property.get_name + ". Cancelling mortgage.");
     },
 
     // Buy one building on the passed property
     buyBuilding: function(player, property){
 
         var monopoly = property.is_monopoly();
-        var numBuildings = property.get_num_buildings();
+        var propBuildings = property.get_num_buildings();
 
         var numHouses = module.exports.numHouses;
         var numHotels = module.exports.numHotels;
+
+        if (!property.get_owner() || property.get_owner() !== player){
+            console.log("You do not own this property.");
+            return;
+        }
 
         //Check to see if there is a monopoly on a property
         if(!monopoly){
@@ -257,8 +270,140 @@ module.exports = {
         }
 
         //Too many buildings
-        if (numBuildings === 5){
+        if (propBuildings === 5){
             console.log("You cannot build any more buildings on this property.");
+            return;
+        }
+
+        var playerProperties = player.get_prop_list();
+        var color = property.get_group();
+        var colorProps = [];
+
+        //Get other properties in color group
+        for (i = 0; i < playerProperties.length; ++i){
+            var prop = playerProperties[i];
+            var propColor = prop.get_group();
+
+            //If property is in color-group of passed property, push to colorProps array
+            if (color === propColor && prop !== property)
+                colorProps.push(prop);
+        }
+
+        //Color-groups with two properties
+        if (color === "purple" || color === "dark-blue"){
+            var prop1 = colorProps[0];
+
+            //Get number of buildings on both properties
+            var prop1Buildings = prop1.get_num_buildings();
+
+            //Check if building evenly
+            if (propBuildings === prop1Buildings || propBuildings === prop1Buildings - 1){
+                var cost = property.get_build_cost();
+
+                if (propBuildings < 4){
+
+                    if (numHouses === 0){
+                        console.log("Sorry, there are no houses left in the bank.");
+                        return;
+                    }
+
+                    console.log("Building a house on " + property.get_name() + " for $" + cost + ".");
+                    property.set_num_buildings(property.get_num_buildings() + 1);
+                    player.set_cash(player.get_cash() - cost);
+                    player.set_num_houses(player.get_num_houses() + 1);
+                    console.log("Take a house from the bank and put it on the property.");
+                    module.exports.numHouses--;
+                }
+
+                else if (propBuildings === 4){
+
+                    if (numHotels === 0){
+                        console.log("Sorry, there are no hotels left in the bank.");
+                        return;
+                    }
+
+                    console.log("Bulding a hotel on " + property.get_name() + " for $" + cost + ".");
+                    property.set_num_buildings(property.get_num_buildings() + 1);
+                    player.set_cash(player.get_cash() - cost);
+                    console.log("Take a hotel from the bank and put it on the property. Return your houses to the bank.");
+                    player.set_num_houses(player.get_num_houses() - 4);
+                    player.set_num_hotels(player.get_num_hotels() + 1);
+                    module.exports.numHotels--;
+                    module.exports.numHouses += 4;
+                }
+            }
+
+            else
+                console.log("You can't build on this property because you don't have enough buildings on the other property in this color-group.");
+        }
+
+        //Color-groups with three properties
+        else {
+            var prop1 = colorProps[0];
+            var prop2 = colorProps[1];
+
+            //Get number of buildings on both properties
+            var prop1Buildings = prop1.get_num_buildings();
+            var prop2Buildings = prop2.get_num_buildings();
+
+            //Check if building evenly
+            if ((propBuildings === prop1Buildings && prop1Buildings === prop2Buildings)
+                    || (propBuildings === prop1Buildings - 1 && propBuildings === prop2Buildings)
+                    || (propBuildings === prop2Buildings - 1 && propBuildings === prop1Buildings)
+                    || (prop1Buildings === prop2Buildings && propBuildings === prop1Buildings - 1)){
+                var cost = property.get_build_cost();
+
+                if (propBuildings < 4){
+
+                    if (numHouses === 0){
+                        console.log("Sorry, there are no houses left in the bank.");
+                        return;
+                    }
+
+                    console.log("Building a house on " + property.get_name() + " for $" + cost + ".");
+                    property.set_num_buildings(property.get_num_buildings() + 1);
+                    player.set_cash(player.get_cash() - cost);
+                    console.log("Take a house from the bank and put it on the property.");
+                    player.set_num_houses(player.get_num_houses() + 1);
+                    module.exports.numHouses--;
+                }
+
+                else if (propBuildings === 4){
+
+                    if (numHotels === 0){
+                        console.log("Sorry, there are no hotels left in the bank.");
+                        return;
+                    }
+
+                    console.log("Building a hotel on " + property.get_name() + " for $" + cost + ".");
+                    property.set_num_buildings(property.get_num_buildings() + 1);
+                    player.set_cash(player.get_cash() - cost);
+                    console.log("Take a hotel from the bank and put it on the property. Return your houses to the bank.");
+                    player.set_num_houses(player.get_num_houses() - 4);
+                    player.set_num_hotels(player.get_num_hotels() + 1);
+                    module.exports.numHotels--;
+                    module.exports.numHouses += 4;
+                }
+            }
+
+            //Check if not building evenly
+            else
+                console.log("You can't build on this property because you don't have enough buildings on the other properties in this color-group.");
+        }
+
+    },
+
+    sellBuilding: function(player, property){
+
+        var propBuildings = property.get_num_buildings();
+
+        if (!property.get_owner() || property.get_owner() !== player){
+            console.log("You do not own this property.");
+            return;
+        }
+
+        if (propBuildings === 0){
+            console.log("You have no buildings on this property.");
             return;
         }
 
@@ -281,93 +426,83 @@ module.exports = {
             var prop1 = colorProps[0];
 
             //Get number of buildings on both properties
-            var propBuildings = property.get_num_buildings();
             var prop1Buildings = prop1.get_num_buildings();
 
-            //Check if building evenly
-            if (propBuildings === prop1Buildings || propBuildings === prop1Buildings - 1){
+            //Check if selling evenly
+            if (propBuildings === prop1Buildings || propBuildings === prop1Buildings + 1){
                 var cost = property.get_build_cost();
 
-                if (numBuildings < 4){
+                if (propBuildings <= 4){
 
-                    if (numHouses === 0){
-                        console.log("Sorry, there are no houses left in the bank.");
-                        return;
-                    }
-
-                    console.log("Building a house on " + property.get_name() + " for $" + cost + ".");
-                    property.set_num_buildings(property.get_num_buildings() + 1);
-                    player.set_cash(player.get_cash() - cost);
-                    module.exports.numHouses--;
+                    console.log("Selling a house on " + property.get_name() + " for $" + cost/2 + ".");
+                    property.set_num_buildings(property.get_num_buildings() - 1);
+                    player.set_cash(player.get_cash() + cost/2);
+                    console.log("Please return the house to the bank.");
+                    player.set_num_houses(player.get_num_houses() - 1);
+                    module.exports.numHouses++;
                 }
 
-                else if (numBuildings === 4){
+                else if (propBuildings === 5){
 
-                    if (numHotels === 0){
-                        console.log("Sorry, there are no hotels left in the bank.");
-                        return;
-                    }
-
-                    console.log("Bulding a hotel on " + property.get_name() + " for $" + cost + ".");
-                    property.set_num_buildings(property.get_num_buildings() + 1);
-                    player.set_cash(player.get_cash() - cost);
+                    console.log("Selling a hotel on " + property.get_name() + " for $" + cost/2 + ".");
+                    property.set_num_buildings(property.get_num_buildings() - 1);
+                    player.set_cash(player.get_cash() + cost/2);
+                    console.log("Please return the hotel to the bank. And place 4 houses on the property.");
+                    player.set_num_houses(player.get_num_houses() + 4);
+                    player.set_num_hotels(player.get_num_hotels() - 1);
                     module.exports.numHotels--;
-                    module.exports.numHouses += 4;
+                    module.exports.numHouses+= 4;
                 }
+
             }
 
             else
-                console.log("You can't build on this property because you don't have enough buildings on the other property in this color-group.");
+                console.log("You can't sell on this property because you have too many buildings on the other property in this color-group.");
         }
 
         //Color-groups with three properties
         else {
             var prop1 = colorProps[0];
-            var prop2 = colorProps[0];
+            var prop2 = colorProps[1];
 
             //Get number of buildings on both properties
-            var propBuildings = property.get_num_buildings();
             var prop1Buildings = prop1.get_num_buildings();
             var prop2Buildings = prop2.get_num_buildings();
 
             //Check if building evenly
             if ((propBuildings === prop1Buildings && propBuildings === prop2Buildings)
-                    || (propBuildings === prop1Buildings - 1 && propBuildings === prop2Buildings)
-                    || (propBuildings === prop2Buildings - 1 && propBuildings === prop1Buildings)
-                    || (propBuildings === prop1Buildings - 1 && propBuildings === prop2Buildings - 1)){
+                    || (propBuildings === prop1Buildings && propBuildings === prop2Buildings + 1)
+                    || (propBuildings === prop2Buildings && propBuildings === prop1Buildings + 1)
+                    || (propBuildings === prop1Buildings + 1 && propBuildings === prop2Buildings + 1)){
                 var cost = property.get_build_cost();
 
-                if (numBuildings < 4){
+                //Selling houses
+                if (propBuildings <= 4){
 
-                    if (numHouses === 0){
-                        console.log("Sorry, there are no houses left in the bank.");
-                        return;
-                    }
-
-                    console.log("Building a house on " + property.get_name() + " for $" + cost + ".");
-                    property.set_num_buildings(property.get_num_buildings() + 1);
-                    player.set_cash(player.get_cash() - cost);
+                    console.log("Selling a house on " + property.get_name() + " for $" + cost/2 + ".");
+                    property.set_num_buildings(property.get_num_buildings() - 1);
+                    player.set_cash(player.get_cash() + cost/2);
+                    console.log("Please return the house to the bank.");
+                    player.set_num_houses(player.get_num_houses() - 1);
                     module.exports.numHouses--;
                 }
 
-                else if (numBuildings === 4){
+                else if (propBuildings === 5){
 
-                    if (numHotels === 0){
-                        console.log("Sorry, there are no hotels left in the bank.");
-                        return;
-                    }
-
-                    console.log("Bulding a hotel on " + property.get_name() + " for $" + cost + ".");
-                    property.set_num_buildings(property.get_num_buildings() + 1);
-                    player.set_cash(player.get_cash() - cost);
+                    console.log("Selling a hotel on " + property.get_name() + " for $" + cost/2 + ".");
+                    property.set_num_buildings(property.get_num_buildings() - 1);
+                    player.set_cash(player.get_cash() + cost/2);
+                    console.log("Please return the hotel to the bank. And place 4 houses on the property.");
+                    player.set_num_houses(player.get_num_houses() + 4);
+                    player.set_num_hotels(player.get_num_hotels() - 1);
                     module.exports.numHotels--;
-                    module.exports.numHouses += 4;
+                    module.exports.numHouses+= 4;
                 }
             }
 
             //Check if not building evenly
             else
-                console.log("You can't build on this property because you don't have enough buildings on the other properties in this color-group.");
+                console.log("You can't sell on this property because have too many buildings on the other properties in this color-group.");
         }
 
     },

@@ -22,7 +22,7 @@ var BORail = new board.Property("B. & O. Railroad", "BORail", 25, 200, "railroad
 var AtlAve = new board.Property("Atlantic Avenue", "AtlAve", 26, 260, "yellow", 22, 110, 330, 800, 975, 1150, 150);
 var VentAve = new board.Property("Ventnor Avenue", "VentAve", 27, 260, "yellow", 22, 110, 330, 800, 975, 1150, 150);
 var Water = new board.Property("Water Works", "Water", 28, 150, "utility");
-var MarvGard = new board.Property("Marvin Garden", "MarvGard", 29, 280, "yellow", 24, 120, 360, 850, 1025, 1200, 150);
+var MarvGard = new board.Property("Marvin Gardens", "MarvGard", 29, 280, "yellow", 24, 120, 360, 850, 1025, 1200, 150);
 var PacAve = new board.Property("Pacific Avenue", "PacAve", 31, 300, "green", 26, 130, 390, 900, 1100, 1275, 200);
 var NCAve = new board.Property("North Carolina Avenue", "NCAve", 32, 300, "green", 26, 130, 390, 900, 1100, 1275, 200);
 var PennAve = new board.Property("Pennsylvania Avenue", "PennAve", 34, 320, "green", 28, 150, 450, 1000, 1200, 1400, 200);
@@ -159,17 +159,24 @@ var doubles = board.rollDice()[1];      //Doubles boolean
 
 var newSpace = board.getNewSpace(player1, gameBoard, diceSum);
 
-player1.add_property(AtlAve);
-player1.add_property(VentAve);
-player1.add_property(MarvGard);
+//console.log(chanceCards);
+//board.movePlayer(player1, gameBoard, players, diceSum, space30, chanceCards, chestCards);
 
-AtlAve.set_num_buildings(2);
-VentAve.set_num_buildings(2);
-MarvGard.set_num_buildings(1);
+
+
+player1.add_property(MarvGard);
+player1.add_property(VentAve);
+player1.add_property(AtlAve);
+
+MarvGard.set_owner(player1);
+
+MarvGard.set_num_buildings(4);
+VentAve.set_num_buildings(5);
+AtlAve.set_num_buildings(5);
 
 AtlAve.set_monopoly_true();
 VentAve.set_monopoly_true();
 MarvGard.set_monopoly_true();
 
-board.buyBuilding(player1, MarvGard);
-console.log(player1.get_cash());
+
+board.sellBuilding(player1, MarvGard);
