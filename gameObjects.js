@@ -1172,18 +1172,18 @@ module.exports = {
                 console.log("This property has no owner."); msg += "This property has no owner.";
                 console.log("You may buy it from the bank for $" + price + ","); msg += "You may buy it from the bank for $" + price + ",";
                 console.log("or put it up for auction."); msg += "or put it up for auction.";
-
-                //Not quite sure how to get answer from user here
-                //Dileep, you can decide how to get the answer
-                var answer = "buy";     //Setting manually for testing
-
-                if (answer === "buy"){
-                    msg += module.exports.buyProperty(player, property);
-                }
-
-                else {
-                    console.log("This property will remain unsold."); msg += "This property will remain unsold.";
-                }
+                //
+                // //Not quite sure how to get answer from user here
+                // //Dileep, you can decide how to get the answer
+                // var answer = "buy";     //Setting manually for testing
+                //
+                // if (answer === "buy"){
+                //     msg += module.exports.buyProperty(player, property);
+                // }
+                //
+                // else {
+                //     console.log("This property will remain unsold."); msg += "This property will remain unsold.";
+                // }
 
             }
 
@@ -1317,9 +1317,9 @@ module.exports = {
             }
         }
 
-        else
+        else {
             console.log("You own this property!"); msg += "You own this property!";
-
+        }
         return msg;
     },
 
@@ -1363,14 +1363,14 @@ module.exports = {
                 }
 
                 else
-                    module.exports.bankruptcy(player, percent, players);
+                    msg += module.exports.bankruptcy(player, percent, players);
             }
 
             console.log("You now have $" + player.get_cash() + "."); msg += "You now have $" + player.get_cash() + ".";
         }
 
         else if (id === "Chance1" || id === "Chance2" || id === "Chance3")
-            module.exports.drawChance(chanceCards, player, players, gameBoard, chestCards);
+            msg += module.exports.drawChance(chanceCards, player, players, gameBoard, chestCards);
 
         else if (id === "Jail") {
             console.log("Don't worry, you're not in trouble! You're just visiting."); msg += "Don't worry, you're not in trouble! You're just visiting.";
@@ -1423,7 +1423,7 @@ module.exports = {
         console.log("Drawing Chance card:\n"); msg += "Drawing Chance card:\n";
 
         //Call chanceAction() function on card
-        module.exports.chanceAction(card, player, players, board, chanceCards, chestCards);
+        msg += module.exports.chanceAction(card, player, players, board, chanceCards, chestCards);
 
         //GOTJ card is given to player, not immediately put at the end
         if (card.get_id() !== "getOutJail"){
@@ -1445,7 +1445,7 @@ module.exports = {
         var card = cards.shift();  //Remove and return first card in array
 
         //Call chestAction() function on card
-        module.exports.chestAction(card, player, players, board, chanceCards, chestCards);
+        msg += module.exports.chestAction(card, player, players, board, chanceCards, chestCards);
 
         //GOTJ card is given to player, not immediately put at the end
         if (card.get_id() !== "getOutJail"){
@@ -1571,18 +1571,18 @@ module.exports = {
 
         if (board.indexOf(newSpace) < currPos){
             if (board.indexOf(newSpace) !== currPos - 3){
-                module.exports.passGo(player);
+                msg += module.exports.passGo(player);
             }
         }
 
         if (newSpace.get_type() === "Property"){
             player.set_space(board.indexOf(newSpace));
-            module.exports.propertySpace(newSpace, player, players, diceSum);
+            msg += module.exports.propertySpace(newSpace, player, players, diceSum);
         }
 
         else{
             player.set_space(board.indexOf(newSpace));
-            module.exports.actionSpace(newSpace, player, players, board, chanceCards, chestCards);
+            msg += module.exports.actionSpace(newSpace, player, players, board, chanceCards, chestCards);
         }
 
         return msg;
