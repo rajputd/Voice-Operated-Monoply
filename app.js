@@ -115,7 +115,7 @@ var chance14 = new board.Chance("advBoard", "Take a walk on the Boardwalk\n"
                                 + "Advance token to Boardwalk", "move");
 var chance15 = new board.Chance("goBack", "Go back 3 spaces", "move");
 
-var chanceCards = [chance0, chance1, chance2, chance3, chance4, chance5,
+var chanceCards = [chance15, chance1, chance2, chance3, chance4, chance5,
                    chance6, chance7, chance8, chance9, chance10, chance11,
                    chance12, chance13, chance14, chance15];
 
@@ -159,9 +159,15 @@ var doubles = board.rollDice()[1];      //Doubles boolean
 
 var newSpace = board.getNewSpace(player1, gameBoard, diceSum);
 
+player2.add_property(Electric);
+Electric.set_owner(player2);
 
-board.movePlayer(player1, gameBoard, players, diceSum, space31, chanceCards, chestCards);
-board.movePlayer(player1, gameBoard, players, diceSum, space32, chanceCards, chestCards);
-board.movePlayer(player1, gameBoard, players, diceSum, space34, chanceCards, chestCards);
+player1.add_property(MedAve);
+MedAve.set_owner(player1);
+MedAve.set_mortgage_true();
 
-board.buyBuilding(player1, PennAve);
+player1.give_chanceJail();
+
+player1.set_cash(0);
+
+board.buyBuilding(player1, MedAve);
