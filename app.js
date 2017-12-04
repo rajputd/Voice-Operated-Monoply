@@ -151,32 +151,13 @@ var player3 = new board.Player("Ernie");
 
 var players = [player1, player2, player3];
 
-board.shuffleArray(chanceCards);
-board.shuffleArray(chestCards);
+//board.shuffleArray(chanceCards);
+//board.shuffleArray(chestCards);
 
 var diceSum = board.rollDice()[0];      //Total of dice roll
 var doubles = board.rollDice()[1];      //Doubles boolean
 
 var newSpace = board.getNewSpace(player1, gameBoard, diceSum);
 
-//console.log(chanceCards);
-//board.movePlayer(player1, gameBoard, players, diceSum, space30, chanceCards, chestCards);
-
-
-
-player1.add_property(MarvGard);
-player1.add_property(VentAve);
-player1.add_property(AtlAve);
-
-MarvGard.set_owner(player1);
-
-MarvGard.set_num_buildings(4);
-VentAve.set_num_buildings(5);
-AtlAve.set_num_buildings(5);
-
-AtlAve.set_monopoly_true();
-VentAve.set_monopoly_true();
-MarvGard.set_monopoly_true();
-
-
-board.sellBuilding(player1, MarvGard);
+player1.set_space(34);
+board.movePlayer(player1, gameBoard, players, diceSum, space3, chanceCards, chestCards);

@@ -171,6 +171,11 @@ module.exports = {
               }
         },
 
+    passGo: function(player){
+        console.log("Collected $200 for passing Go!");
+        player.set_cash(player.get_cash() + 200);
+    },
+
     // Calculate the net worth of a player. Doesn't handle houses and hotels, just yet.
     getNetWorth: function(player){
 
@@ -843,11 +848,8 @@ module.exports = {
 
         else if (action === "move"){
 
-            if (id === "advGo"){
+            if (id === "advGo")
                 module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[0]);
-                console.log("You landed on Go!");
-                //trigger go function
-            }
 
             //Need to pay owner 2x rent if already owned
             else if (id === "nearestRail1"){
@@ -855,8 +857,6 @@ module.exports = {
 
                 if (position === 7){
                    module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[15]);
-
-
                }
 
                 else if (position === 22)
@@ -1012,10 +1012,8 @@ module.exports = {
             if (id === "goToJail")
                 module.exports.jail(player, gameBoard, players, chanceCards, chestCards);
 
-            else if (id === "advGo"){
+            else if (id === "advGo")
                 module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[0]);
-                console.log("You landed on Go!");
-            }
         }
     },
 
@@ -1412,9 +1410,8 @@ module.exports = {
         var currPos = player.get_space();
         console.log("Move your piece to " + newSpace.get_name() + ".\n");
 
-        if (board.indexOf(newSpace) < currPos){
-                //trigger Go function
-            }
+        if (board.indexOf(newSpace) < currPos)
+                module.exports.passGo(player);
 
         if (newSpace.get_type() === "Property"){
             player.set_space(board.indexOf(newSpace));
