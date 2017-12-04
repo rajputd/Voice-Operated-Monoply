@@ -1053,85 +1053,54 @@ module.exports = {
                     player.properties.push(property);
                     console.log("You successfully purchased " + property.get_name()
                             + " for " + "$" + price + ".");
-                    console.log("You now have $" + player.get_cash() + ".");
+                    console.log("You now have $" + player.get_cash() + ".\n");
 
+                    //Check to see if purchase activates monopoly
+                    if (group !== "railroad" || group === "utility"){
+                        var playerProperties = player.get_prop_list();
+                        var color = property.get_group();
+                        var colorProps = [];
+
+                        //Get other properties in color-group if they're there
+                        for (i = 0; i < playerProperties.length; ++i){
+                            var prop = playerProperties[i];
+                            var propColor = prop.get_group();
+
+                            //If property is in color-group of passed property, push to colorProps array
+                            if (color === propColor && prop !== property)
+                                colorProps.push(prop);
+                        }
+
+                        if (color === "purple" || color === "dark-blue"){
+                            if (colorProps.length === 1){
+                                console.log("You now have a monopoly on the " + color + " color-group!");
+                                console.log("You can now build on these properties and earn double the base rent!\n");
+
+                                property.set_monopoly_true();
+                                colorProps[0].set_monopoly_true();
+                            }
+                        }
+
+                        else{
+                            if (colorProps.length === 2){
+                                console.log("You now have a monopoly on the " + color + " color-group!");
+                                console.log("You can now build on these properties and earn double the base rent!\n");
+
+                                property.set_monopoly_true();
+                                colorProps[0].set_monopoly_true();
+                                colorProps[1].set_monopoly_true();
+                            }
+                        }
+                    }
                 }
-
-                //Still feels really wonky. May want to scrap this
-                else if (answer === "auction"){
-                    console.log("Everyone may enter a bid.");
-                    console.log("Whoever makes the highest bid will pay that price for the property.");
-                    console.log("Let me know when the auction is over.");
-
-                    //Once bid is resolved, get purchaser and price
-                    var purchaser = players[1];         //Setting manually for testing, this input is a player object
-                    var i = players.indexOf(purchaser); //Find index of purchaser in players array
-
-                    var buyer = players[i]; //Now called buyer after finding player in array
-                    var price = 40;         //Setting manually for testing
-
-                    if (group === "railroad")
-                        buyer.set_num_railroads(player.get_num_railroads() + 1);
-
-                    else if (group === "utility")
-                        buyer.set_num_utilities(player.get_num_utilities() + 1);
-
-                    buyer.set_cash(cash - price);
-                    property.set_owner(buyer);
-                    buyer.properties.push(property);
-                    console.log(buyer.get_name() + " successfully purchased " + property.get_name()
-                            + " for " + "$" + price + ".");
-                    console.log(buyer.get_name() + " now has $" + buyer.get_cash() + ".");
-                }
+                else
+                    console.log("This property will remain unsold.");
             }
 
             //if player has insufficient
             else if (cash < price){
-
-                console.log("You need $" + (price-cash) + " purchase this property.");
-                console.log("You can sell buildings or mortgage properties to earn money,");
-                console.log(" or you can just put this property up for auction.");
-                console.log("Let me know if you want to buy or auction this property");
-
-               //Get buy or auction intent
-               var intent = "buy";
-
-               if (intent === "buy"){
-                   /* Call mortgage and sell buildings functions until
-                    * A. User has enought money to purchase property,
-                    * B. User has nothing left to sell, or
-                    * C. User changes mind and auctions
-                    *
-                    * If A, trigger normal buying logic and break when done
-                    * If B or C, change intent = "auction", and allow next case to take over
-                    */
-               }
-
-               else if (intent === "auction"){
-                    console.log("Everyone may enter a bid.");
-                    console.log("Whoever makes the highest bid will pay that price for the property.");
-                    console.log("Let me know when the auction is over.");
-
-                    //Once bid is resolved, get purchaser and price
-                    var purchaser = players[1];         //Setting manually for testing, this input is a player object
-                    var i = players.indexOf(purchaser); //Find index of purchaser in players array
-
-                    var buyer = players[i]; //Now called buyer after finding player in array
-                    var price = 40;         //Setting manually for testing
-
-                    if (group === "railroad")
-                        buyer.set_num_railroads(player.get_num_railroads() + 1);
-
-                    else if (group === "utility")
-                        buyer.set_num_utilities(player.get_num_utilities() + 1);
-
-                    buyer.set_cash(cash - price);
-                    property.set_owner(buyer);
-                    buyer.properties.push(property);
-                    console.log(buyer.get_name() + " successfully purchased " + property.get_name()
-                            + " for " + "$" + price + ".");
-                    console.log(buyer.get_name() + " now has $" + buyer.get_cash() + ".");
-                }
+                console.log("You don't have enough money to purchase this property.");
+                console.log("This property will remain unsold.");
             }
         }
 

@@ -159,5 +159,9 @@ var doubles = board.rollDice()[1];      //Doubles boolean
 
 var newSpace = board.getNewSpace(player1, gameBoard, diceSum);
 
-player1.set_space(34);
-board.movePlayer(player1, gameBoard, players, diceSum, space3, chanceCards, chestCards);
+
+board.movePlayer(player1, gameBoard, players, diceSum, space31, chanceCards, chestCards);
+board.movePlayer(player1, gameBoard, players, diceSum, space32, chanceCards, chestCards);
+board.movePlayer(player1, gameBoard, players, diceSum, space34, chanceCards, chestCards);
+
+board.buyBuilding(player1, PennAve);
