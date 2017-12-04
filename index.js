@@ -87,7 +87,7 @@ var server = app.listen(app.get('port'), function () {
 
 function set_player_num(app) {
 	app.data.player_num = app.getArgument(NUM_PLAYERS_ARGUMENT);
-	app.ask('Alright, so we are going to have ' + app.data.player_num +
+	app.ask('So we are going to have ' + app.data.player_num +
 		' players then? Is that correct?');
 }
 
@@ -104,7 +104,7 @@ function set_names(app) {
 	} else {
 		app.setContext(CONFIRM_NAMES_CONTEXT, 1);
 		app.data.player_names = player_names;
-		app.ask('Alright, so our ' + app.data.player_num + ' players are ' + player_names.slice(0, player_names.length - 1) +
+		app.ask('Our ' + app.data.player_num + ' players are ' + player_names.slice(0, player_names.length - 1) +
 				' and ' + player_names[player_names.length - 1] + '. Did I get everyone?');
 	}
 }
@@ -113,6 +113,8 @@ function start_game(app) {
 	//instantiate game
 	var player_names = app.data.player_names;
 	game = new Game(player_names);
+	GameObjects.shuffleArray(game.chanceCards);
+	GameObjects.shuffleArray(game.chestCards);
 
 	//select a random player
 	var current_player_index = Math.floor(Math.random() * player_names.length);
@@ -172,9 +174,14 @@ function get_my_properties(app) {
 	if(properties.length == 0){
 		app.ask('you don\'t own any properties');
 	} else if (properties.length == 1){
-		app.ask('you own ' + properties);
+		app.ask('you own ' + properties[0].get_name());
 	} else {
-	app.ask('you own ' + properties.splice(0, properties.length - 1) + ' and ' + properties[properties.length - 1]);
+		var msg = curr_player_name + ' owns ';
+		for(i = 0; i < properties.lenth - 2; i++) {
+			msg += properties[i].get_name() + ' ';
+		}
+		msg += 'and ' + properties[properties.length - 1].get_name();
+		app.ask(msg);
 	}
 }
 
@@ -185,9 +192,14 @@ function get_player_properties(app) {
 	if(properties.length == 0){
 		app.ask(player_name + ' doesn\'t own any properties');
 	} else if (properties.length == 1){
-		app.ask(player_name + ' owns ' + properties);
+		app.ask(player_name + ' owns ' + properties[0].get_name());
 	} else {
-	app.ask( player_name + ' owns ' + properties.splice(0, properties.length - 1) + ' and ' + properties[properties.length - 1]);
+	var msg = player_name + ' owns ';
+	for(i = 0; i < properties.lenth - 2; i++) {
+		msg += properties[i].get_name() + ' ';
+	}
+	msg += 'and ' + properties[properties.length - 1].get_name();
+	app.ask(msg);
 	}
 }
 
@@ -229,17 +241,24 @@ function get_property_owner(app) {
 	if (property_obj.get_owner() == undefined) {
 		app.ask("nobody owns " + property);
 	} else {
-		app.ask(property + ' is owned by ' + property_obj.get_owner());
+		app.ask(property + ' is owned by ' + property_obj.get_owner().get_name());
 	}
 
 }
 
 function build_house(app) {
 	var properties = app.getArgument(PROPERTIES_ARGUMENT);
-	var house_number = app.getArgument(NUMBER_OF_HOUSES_ARGUMENT);
-	//check if user owns that property
-	//buy the house and add it to said property
-	app.ask('you built ' + house_number + ' houses on ' + properties);
+	var msg = '';
+
+	var curr_player_index = app.data.current_player_index;
+	var curr_player_name = app.data.player_names[curr_player_index];
+	var curr_player = game.players[curr_player_name];
+	for(i = 0; i < properties.length; i++) {
+			var property = game.getProperty(properties[i]);
+			msg += GameObjects.buyBuilding(curr_player, property);
+	}
+
+	app.ask(msg);
 }
 
 function build_hotel(app) {
@@ -250,10 +269,13 @@ function build_hotel(app) {
 }
 
 function end_turn(app) {
-	//set a new current player
-	//check if player CAN end their turn. e.g. have they rolled dice, etc?
-	var new_player = app.data.player_names[1];
-	app.ask('OK, ' + new_player + ' it is now your turn');
+	var curr_player_index = app.data.current_player_index;
+	curr_player_index = ((curr_player_index) + 1) % app.data.player_num;
+	app.data.current_player_index = curr_player_index;
+	var curr_player_name = app.data.player_names[curr_player_index];
+	app.data.has_rolled_dice = false;
+
+	app.ask('OK, ' + curr_player_name + ' it is now your turn');
 }
 
 function sell_house(app) {
@@ -271,5 +293,11 @@ function use_jail_card(app) {
 
 function buy_current_property(app) {
 	//check if use can buy current property
-	app.ask('you bought the current property you are on');
+	var curr_player_index = app.data.current_player_index;
+	var curr_player_name = app.data.player_names[curr_player_index];
+	var curr_player = game.players[curr_player_name];
+	var curr_space = curr_player.get_space();
+	var curr_prop = game.gameBoard[curr_space].get_prop();
+	var msg = GameObjects.buyProperty(curr_player, curr_prop);
+	app.ask(msg);
 }

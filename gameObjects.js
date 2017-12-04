@@ -1112,6 +1112,7 @@ module.exports = {
                 + " for " + "$" + price + "."); msg += "You successfully purchased " + property.get_name() + ". "
                         + " for " + "$" + price + ".";
         console.log("You now have $" + player.get_cash() + ".\n"); msg += "You now have $" + player.get_cash() + ".\n";
+        console.log("Please take the property card for " + property.get_name() + "."); msg += "Please take the property card for " + property.get_name() + ".";
 
         //Check to see if purchase activates monopoly
         if (group !== "railroad" || group === "utility"){
@@ -1195,6 +1196,7 @@ module.exports = {
         }
 
         else if (owner !== player){
+          console.log(players);
             var i = players.indexOf(owner);
             owner = players[i];
 
