@@ -1,6 +1,13 @@
 var board = require("./gameObjects");
 
-module.exports = function(player_num, player_names) {
+module.exports = function(player_names) {
+
+  var players = {};
+  for(i = 0; i < player_names.length; i++) {
+    players[player_names[i]] = new board.Player(player_names[i]);
+  }
+
+  this.players = players;
 
   this.gameObjects = board;
 
