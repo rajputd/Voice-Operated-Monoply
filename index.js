@@ -31,6 +31,7 @@ const GET_PROPERTY_OWNER_ACTION = 'get_property_owner';
 const BUILD_HOUSE_ACTION = 'build_house';
 const BUILD_HOTEL_ACTION = 'build_hotel';
 const END_TURN_ACTION = 'end_turn';
+const SELL_HOUSE_ACTION = 'sell_houses';
 
 // the parameters that are parsed from the make_name intent 
 const NUM_PLAYERS_ARGUMENT = 'num_players';
@@ -60,6 +61,8 @@ app.post('/', function (request, response) {
 	actionMap.set(BUILD_HOUSE_ACTION, build_house);
 	actionMap.set(BUILD_HOTEL_ACTION, build_hotel);
 	actionMap.set(END_TURN_ACTION, end_turn);
+	actionMap.set(SELL_HOUSE_ACTION, sell_house);
+
 
 	app.handleRequest(actionMap);
 
@@ -188,4 +191,11 @@ function end_turn(app) {
 	//check if player CAN end their turn. e.g. have they rolled dice, etc?
 	var new_player = app.data.player_names[1];
 	app.ask('OK, ' + new_player + ' it is now your turn');
+}
+
+function sell_house(app) {
+	//check if player can sell that house
+	var properties = app.getArgument(PROPERTIES_ARGUMENT);
+	var house_number = app.getArgument(NUMBER_OF_HOUSES_ARGUMENT);
+	app.ask('You sold ' + house_number + ' houses on ' + properties + ' for $50 each');
 }
