@@ -1091,6 +1091,68 @@ module.exports = {
         return msg;
     },
 
+    //Function to buy property
+    buyProperty: function(player, property){
+
+        var msg = '';
+        var cash = player.get_cash();
+        var group = property.get_group();
+        var price = property.get_price();
+
+        if (group === "railroad")
+            player.set_num_railroads(player.get_num_railroads() + 1);
+
+        else if (group === "utility")
+            player.set_num_utilities(player.get_num_utilities() + 1);
+
+        player.set_cash(cash - price);
+        property.set_owner(player);
+        player.properties.push(property);
+        console.log("You successfully purchased " + property.get_name()
+                + " for " + "$" + price + "."); msg += "You successfully purchased " + property.get_name()
+                        + " for " + "$" + price + ".";
+        console.log("You now have $" + player.get_cash() + ".\n"); msg += "You now have $" + player.get_cash() + ".\n";
+
+        //Check to see if purchase activates monopoly
+        if (group !== "railroad" || group === "utility"){
+            var playerProperties = player.get_prop_list();
+            var color = property.get_group();
+            var colorProps = [];
+
+            //Get other properties in color-group if they're there
+            for (i = 0; i < playerProperties.length; ++i){
+                var prop = playerProperties[i];
+                var propColor = prop.get_group();
+
+                //If property is in color-group of passed property, push to colorProps array
+                if (color === propColor && prop !== property)
+                    colorProps.push(prop);
+            }
+
+            if (color === "purple" || color === "dark-blue"){
+                if (colorProps.length === 1){
+                    console.log("You now have a monopoly on the " + color + " color-group!"); msg += "You now have a monopoly on the " + color + " color-group!";
+                    console.log("You can now build on these properties and earn double the base rent!\n"); msg += "You can now build on these properties and earn double the base rent!\n";
+
+                    property.set_monopoly_true();
+                    colorProps[0].set_monopoly_true();
+                }
+            }
+
+            else{
+                if (colorProps.length === 2){
+                    console.log("You now have a monopoly on the " + color + " color-group!"); msg += "You now have a monopoly on the " + color + " color-group!";
+                    console.log("You can now build on these properties and earn double the base rent!\n"); msg += "You can now build on these properties and earn double the base rent!\n";
+
+                    property.set_monopoly_true();
+                    colorProps[0].set_monopoly_true();
+                    colorProps[1].set_monopoly_true();
+                }
+            }
+        }
+        return msg;
+    },
+
     //Triggers when you land on a property space
     propertySpace: function(space, currPlayer, players, diceSum){
         var msg = '';
@@ -1116,59 +1178,9 @@ module.exports = {
                 var answer = "buy";     //Setting manually for testing
 
                 if (answer === "buy"){
-
-                    if (group === "railroad")
-                        player.set_num_railroads(player.get_num_railroads() + 1);
-
-                    else if (group === "utility")
-                        player.set_num_utilities(player.get_num_utilities() + 1);
-
-                    player.set_cash(cash - price);
-                    property.set_owner(player);
-                    player.properties.push(property);
-                    console.log("You successfully purchased " + property.get_name()
-                            + " for " + "$" + price + "."); msg += "You successfully purchased " + property.get_name()
-                                    + " for " + "$" + price + ".";
-                    console.log("You now have $" + player.get_cash() + ".\n"); msg += "You now have $" + player.get_cash() + ".\n";
-
-                    //Check to see if purchase activates monopoly
-                    if (group !== "railroad" || group === "utility"){
-                        var playerProperties = player.get_prop_list();
-                        var color = property.get_group();
-                        var colorProps = [];
-
-                        //Get other properties in color-group if they're there
-                        for (i = 0; i < playerProperties.length; ++i){
-                            var prop = playerProperties[i];
-                            var propColor = prop.get_group();
-
-                            //If property is in color-group of passed property, push to colorProps array
-                            if (color === propColor && prop !== property)
-                                colorProps.push(prop);
-                        }
-
-                        if (color === "purple" || color === "dark-blue"){
-                            if (colorProps.length === 1){
-                                console.log("You now have a monopoly on the " + color + " color-group!"); msg += "You now have a monopoly on the " + color + " color-group!";
-                                console.log("You can now build on these properties and earn double the base rent!\n"); msg += "You can now build on these properties and earn double the base rent!\n";
-
-                                property.set_monopoly_true();
-                                colorProps[0].set_monopoly_true();
-                            }
-                        }
-
-                        else{
-                            if (colorProps.length === 2){
-                                console.log("You now have a monopoly on the " + color + " color-group!"); msg += "You now have a monopoly on the " + color + " color-group!";
-                                console.log("You can now build on these properties and earn double the base rent!\n"); msg += "You can now build on these properties and earn double the base rent!\n";
-
-                                property.set_monopoly_true();
-                                colorProps[0].set_monopoly_true();
-                                colorProps[1].set_monopoly_true();
-                            }
-                        }
-                    }
+                    msg += module.exports.buyProperty(player, property);
                 }
+
                 else {
                     console.log("This property will remain unsold."); msg += "This property will remain unsold.";
                 }
