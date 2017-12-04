@@ -27,6 +27,7 @@ const GET_MY_PROPERTIES_ACTION = 'get_my_properties';
 const GET_PLAYER_PROPERTIES_ACTION = 'get_player_properties';
 const MORTGAGE_PROPERTY_ACTION = 'mortgage_property';
 const UNMORTGAGE_PROPERTY_ACTION = 'unmortgage_property';
+const GET_PROPERTY_OWNER_ACTION = 'get_property_owner';
 
 // the parameters that are parsed from the make_name intent 
 const NUM_PLAYERS_ARGUMENT = 'num_players';
@@ -51,6 +52,7 @@ app.post('/', function (request, response) {
 	actionMap.set(GET_PLAYER_PROPERTIES_ACTION, get_player_properties);
 	actionMap.set(MORTGAGE_PROPERTY_ACTION, mortgage_property);
 	actionMap.set(UNMORTGAGE_PROPERTY_ACTION, unmortgage_property);
+	actionMap.set(GET_PROPERTY_OWNER_ACTION, get_property_owner);
 
 	app.handleRequest(actionMap);
 
@@ -150,4 +152,11 @@ function unmortgage_property(app) {
 	//check if properties are mortgaged
 	//unmortgage those properties
 	app.ask('OK, I unmortgaged ' + properties);
+}
+
+function get_property_owner(app) {
+	var property = app.getArgument(PROPERTIES_ARGUMENT);
+	//loop through properties and list out their owners
+	//if the property list is greater than the number of players, list the properties by player e.g. nick owns parkplace and vermont
+	app.ask(property + ' is owned by ' + app.data.player_names[0]);
 }
