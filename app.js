@@ -22,7 +22,7 @@ var BORail = new board.Property("B. & O. Railroad", "BORail", 25, 200, "railroad
 var AtlAve = new board.Property("Atlantic Avenue", "AtlAve", 26, 260, "yellow", 22, 110, 330, 800, 975, 1150, 150);
 var VentAve = new board.Property("Ventnor Avenue", "VentAve", 27, 260, "yellow", 22, 110, 330, 800, 975, 1150, 150);
 var Water = new board.Property("Water Works", "Water", 28, 150, "utility");
-var MarvGard = new board.Property("Marvin Garden", "MarvGard", 29, 280, "yellow", 24, 120, 360, 850, 1025, 1200, 150);
+var MarvGard = new board.Property("Marvin Gardens", "MarvGard", 29, 280, "yellow", 24, 120, 360, 850, 1025, 1200, 150);
 var PacAve = new board.Property("Pacific Avenue", "PacAve", 31, 300, "green", 26, 130, 390, 900, 1100, 1275, 200);
 var NCAve = new board.Property("North Carolina Avenue", "NCAve", 32, 300, "green", 26, 130, 390, 900, 1100, 1275, 200);
 var PennAve = new board.Property("Pennsylvania Avenue", "PennAve", 34, 320, "green", 28, 150, 450, 1000, 1200, 1400, 200);
@@ -115,11 +115,9 @@ var chance14 = new board.Chance("advBoard", "Take a walk on the Boardwalk\n"
                                 + "Advance token to Boardwalk", "move");
 var chance15 = new board.Chance("goBack", "Go back 3 spaces", "move");
 
-var chanceCards = [chance0, chance1, chance2, chance3, chance4, chance5,
+var chanceCards = [chance15, chance1, chance2, chance3, chance4, chance5,
                    chance6, chance7, chance8, chance9, chance10, chance11,
                    chance12, chance13, chance14, chance15];
-
-var chanceDiscards = [];
 
 var chest0 = new board.Chest("hospital", "Pay hospital $100", "pay");
 var chest1 = new board.Chest("docFee", "Doctor's Fee\nPay $50", "pay");
@@ -147,10 +145,29 @@ var chestCards = [chest0, chest1, chest2, chest3, chest4, chest5, chest6,
                   chest7, chest8, chest9, chest10, chest11, chest12, chest13,
                   chest14, chest15];
 
-var chestDiscards = [];
-
 var player1 = new board.Player("Nick");
 var player2 = new board.Player("Dileep");
 var player3 = new board.Player("Ernie");
 
 var players = [player1, player2, player3];
+
+//board.shuffleArray(chanceCards);
+//board.shuffleArray(chestCards);
+
+var diceSum = board.rollDice()[0];      //Total of dice roll
+var doubles = board.rollDice()[1];      //Doubles boolean
+
+var newSpace = board.getNewSpace(player1, gameBoard, diceSum);
+
+player2.add_property(Electric);
+Electric.set_owner(player2);
+
+player1.add_property(MedAve);
+MedAve.set_owner(player1);
+MedAve.set_mortgage_true();
+
+player1.give_chanceJail();
+
+player1.set_cash(0);
+
+board.buyBuilding(player1, MedAve);
