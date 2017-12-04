@@ -6,6 +6,7 @@ process.env.DEBUG = 'actions-on-google:*';
 let App = require('actions-on-google').DialogflowApp;
 let express = require('express');
 let bodyParser = require('body-parser');
+let Game = require('./game');
 
 let app = express();
 app.set('port', (process.env.PORT || 8080));
@@ -36,7 +37,7 @@ const USE_JAIL_CARD_ACTION = 'use_jail_card';
 const BUY_CURRENT_PROPERTY_ACTION = 'buy_current_property';
 
 
-// the parameters that are parsed from the make_name intent 
+// the parameters that are parsed from the make_name intent
 const NUM_PLAYERS_ARGUMENT = 'num_players';
 const PLAYER_NAMES_ARGUMENT = 'player';
 const PROPERTIES_ARGUMENT = 'properties';
@@ -48,7 +49,7 @@ app.post('/', function (request, response) {
 	console.log('body: ' + JSON.stringify(request.body));
 
 	const app = new App({request: request, response: response});
-		
+
 	let actionMap = new Map();
 	actionMap.set(SET_PLAYER_NUM_ACTION, set_player_num);
 	actionMap.set(SET_NAMES_ACTION, set_names);
@@ -84,7 +85,7 @@ var server = app.listen(app.get('port'), function () {
 
 function set_player_num(app) {
 	app.data.player_num = app.getArgument(NUM_PLAYERS_ARGUMENT);
-	app.ask('Alright, so we are going to have ' + app.data.player_num + 
+	app.ask('Alright, so we are going to have ' + app.data.player_num +
 		' players then? Is that correct?');
 }
 
@@ -101,18 +102,23 @@ function set_names(app) {
 	} else {
 		app.setContext(CONFIRM_NAMES_CONTEXT, 1);
 		app.data.player_names = player_names;
-		app.ask('Alright, so our ' + app.data.player_num + ' players are ' + player_names.slice(0, player_names.length - 1) + 
+		app.ask('Alright, so our ' + app.data.player_num + ' players are ' + player_names.slice(0, player_names.length - 1) +
 				' and ' + player_names[player_names.length - 1] + '. Did I get everyone?');
 	}
 }
 
 function start_game(app) {
-	//instantiate players from app.data.player_names
-	//app.data.board = new Board
+	//instantiate game
+	var player_names = app.data.player_names;
+	app.data.game = new Game(player_names);
+
 	//select a random player
-	var current_player = 'some player';
+	var current_player_index = Math.floor(Math.random() * player_names.length);
+	var current_player_name = player_names[current_player_index];
+	app.data.current_player_index = current_player_index;
+
 	app.setContext(TURN_ACTION_CONTEXT);
-	app.ask('Great! The game will now start. ' + current_player + ' will go first. During your turn, you can  check your balance, mortgage and unmortgage any properties you own, buy and sell houses on any properties you have a monopoly on, trade with other players, and roll the dice to move.');
+	app.ask('Great! The game will now start. ' + current_player_name + ' will go first. During your turn, you can  check your balance, mortgage and unmortgage any properties you own, buy and sell houses on any properties you have a monopoly on, trade with other players, and roll the dice to move.');
 }
 
 function roll_dice(app) {

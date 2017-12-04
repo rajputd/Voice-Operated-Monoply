@@ -1276,7 +1276,7 @@ module.exports = {
                         owner.set_cash(owner.get_cash() + rent);
                         player.set_cash(player.get_cash() - rent);
                         console.log("You payed " + owner.get_name() + " $" + rent); msg += "You payed " + owner.get_name() + " $" + rent;
-                        console.log("You now have $" + player.get_cash()); msg += "You now have $" + player.get_cash())
+                        console.log("You now have $" + player.get_cash()); msg += "You now have $" + player.get_cash();
                     }
 
                     else if (cash < rent){
