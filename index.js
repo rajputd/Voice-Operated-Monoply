@@ -33,6 +33,8 @@ const BUILD_HOTEL_ACTION = 'build_hotel';
 const END_TURN_ACTION = 'end_turn';
 const SELL_HOUSE_ACTION = 'sell_houses';
 const USE_JAIL_CARD_ACTION = 'use_jail_card';
+const BUY_CURRENT_PROPERTY_ACTION = 'buy_current_property';
+
 
 // the parameters that are parsed from the make_name intent 
 const NUM_PLAYERS_ARGUMENT = 'num_players';
@@ -64,6 +66,7 @@ app.post('/', function (request, response) {
 	actionMap.set(END_TURN_ACTION, end_turn);
 	actionMap.set(SELL_HOUSE_ACTION, sell_house);
 	actionMap.set(USE_JAIL_CARD_ACTION, use_jail_card);
+	actionMap.set(BUY_CURRENT_PROPERTY_ACTION, buy_current_property);
 
 
 	app.handleRequest(actionMap);
@@ -206,4 +209,9 @@ function use_jail_card(app) {
 	//check if player is in jail
 	//check if they have a jail card
 	app.ask('you used your get out of jail free card');
+}
+
+function buy_current_property(app) {
+	//check if use can buy current property
+	app.ask('you bought the current property you are on');
 }
