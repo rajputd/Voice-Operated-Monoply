@@ -28,11 +28,13 @@ const GET_PLAYER_PROPERTIES_ACTION = 'get_player_properties';
 const MORTGAGE_PROPERTY_ACTION = 'mortgage_property';
 const UNMORTGAGE_PROPERTY_ACTION = 'unmortgage_property';
 const GET_PROPERTY_OWNER_ACTION = 'get_property_owner';
+const BUILD_HOUSE_ACTION = 'build_house';
 
 // the parameters that are parsed from the make_name intent 
 const NUM_PLAYERS_ARGUMENT = 'num_players';
 const PLAYER_NAMES_ARGUMENT = 'player';
 const PROPERTIES_ARGUMENT = 'properties';
+const NUMBER_OF_HOUSES_ARGUMENT = 'house_number';
 
 
 app.post('/', function (request, response) {
@@ -53,6 +55,7 @@ app.post('/', function (request, response) {
 	actionMap.set(MORTGAGE_PROPERTY_ACTION, mortgage_property);
 	actionMap.set(UNMORTGAGE_PROPERTY_ACTION, unmortgage_property);
 	actionMap.set(GET_PROPERTY_OWNER_ACTION, get_property_owner);
+	actionMap.set(BUILD_HOUSE_ACTION, build_house);
 
 	app.handleRequest(actionMap);
 
@@ -159,4 +162,12 @@ function get_property_owner(app) {
 	//loop through properties and list out their owners
 	//if the property list is greater than the number of players, list the properties by player e.g. nick owns parkplace and vermont
 	app.ask(property + ' is owned by ' + app.data.player_names[0]);
+}
+
+function build_house(app) {
+	var properties = app.getArgument(PROPERTIES_ARGUMENT);
+	var house_number = app.getArgument(NUMBER_OF_HOUSES_ARGUMENT);
+	//check if user owns that property
+	//buy the house and add it to said property
+	app.ask('you built ' + house_number + ' houses on ' + properties);
 }
