@@ -7,6 +7,8 @@ let App = require('actions-on-google').DialogflowApp;
 let express = require('express');
 let bodyParser = require('body-parser');
 let Game = require('./game');
+let GameObjects = require('./gameObjects');
+let game;
 
 let app = express();
 app.set('port', (process.env.PORT || 8080));
@@ -110,12 +112,13 @@ function set_names(app) {
 function start_game(app) {
 	//instantiate game
 	var player_names = app.data.player_names;
-	app.data.game = new Game(player_names);
+	game = new Game(player_names);
 
 	//select a random player
 	var current_player_index = Math.floor(Math.random() * player_names.length);
 	var current_player_name = player_names[current_player_index];
 	app.data.current_player_index = current_player_index;
+	app.data.has_rolled_dice = false;
 
 	app.setContext(TURN_ACTION_CONTEXT);
 	app.ask('Great! The game will now start. ' + current_player_name + ' will go first. During your turn, you can  check your balance, mortgage and unmortgage any properties you own, buy and sell houses on any properties you have a monopoly on, trade with other players, and roll the dice to move.');
@@ -123,63 +126,112 @@ function start_game(app) {
 
 function roll_dice(app) {
 	//get player whose turn it is
-	//check if they've rolled the dice already
+	var curr_player_index = app.data.current_player_index;
+	var curr_player_name = app.data.player_names[curr_player_index];
+	var curr_player = game.players[curr_player_name];
+
 	//check if they're in jail, if yes roll for doubles for freedom, else wait
-	//roll the dice
-	//move them to the appropriate spot
-	//tell them where they landed
-	//execute any special thing they have to do e.g. go to jail, buy a property or auction it off
-	//let them know if they've passed go
-	//let them know that they've rolled doubles and can go again
-	//send them to jail for speeding if they've rolled doubles 3 times
-	app.ask('You rolled double sixes hurray!');
+
+	//check if they've rolled the dice already
+	if(!app.data.has_rolled_dice) {
+		var board = game.gameBoard;
+		var players = game.players;
+		var dice_results = GameObjects.rollDice();
+		var new_space = GameObjects.getNewSpace(curr_player, board, dice_results[0]);
+		var chance = game.chanceCards;
+		var chest = game.chestCards;
+		var msg = GameObjects.movePlayer(curr_player, board, players, dice_results[0], new_space, chance, chest);
+		app.data.has_rolled_dice = true;
+		app.ask(msg);
+	} else {
+		app.ask("I'm sorry you have already rolled the dice this turn");
+	}
 }
 
 function get_my_account_balance(app) {
-	//get current player name
+	//get player whose turn it is
+	var curr_player_index = app.data.current_player_index;
+	var curr_player_name = app.data.player_names[curr_player_index];
+	var curr_player = game.players[curr_player_name];
 	//look up how much money they have
-	app.ask('You have $1500 in your bank account');
+	app.ask('You have $' + curr_player.get_cash() + ' in your bank account');
 }
 
 function get_player_account_balance(app) {
 	var player_name = app.getArgument(PLAYER_NAMES_ARGUMENT);
-	//check if it is a valid player name
-	//look up how much money they have.
-	app.ask(player_name + ' has $200.');
+	var player = game.players[player_name];
+	app.ask(player_name + ' has $' + player.get_cash() + ' in their bank account');
 }
 
 function get_my_properties(app) {
-	//get current player name
-	app.ask('you own park place');
+	//get player whose turn it is
+	var curr_player_index = app.data.current_player_index;
+	var curr_player_name = app.data.player_names[curr_player_index];
+	var curr_player = game.players[curr_player_name];
+	var properties = curr_player.get_prop_list();
+	if(properties.length == 0){
+		app.ask('you don\'t own any properties');
+	} else if (properties.length == 1){
+		app.ask('you own ' + properties);
+	} else {
+	app.ask('you own ' + properties.splice(0, properties.length - 1) + ' and ' + properties[properties.length - 1]);
+	}
 }
 
 function get_player_properties(app) {
 	var player_name = app.getArgument(PLAYER_NAMES_ARGUMENT);
-	//check if it is a valid player name
-	app.ask(player_name + ' owns vermont avenue.');
+	var player = game.players[player_name];
+	var properties = player.get_prop_list();
+	if(properties.length == 0){
+		app.ask(player_name + ' doesn\'t own any properties');
+	} else if (properties.length == 1){
+		app.ask(player_name + ' owns ' + properties);
+	} else {
+	app.ask( player_name + ' owns ' + properties.splice(0, properties.length - 1) + ' and ' + properties[properties.length - 1]);
+	}
 }
 
 function mortgage_property(app) {
 	var properties = app.getArgument(PROPERTIES_ARGUMENT);
-	//check if player owns those properties
-	//check if properties are already mortgaged
-	//mortgage given properties
-	app.ask('OK, I mortgaged ' + properties);
+	var msg = '';
+
+	var curr_player_index = app.data.current_player_index;
+	var curr_player_name = app.data.player_names[curr_player_index];
+	var curr_player = game.players[curr_player_name];
+
+	for(i = 0; i < properties.length; i++) {
+		var prop_obj = game.getProperty(properties[i]);
+		msg += GameObjects.mortgageProperty(curr_player, prop_obj);
+	}
+	app.ask(msg);
 }
 
 function unmortgage_property(app) {
 	var properties = app.getArgument(PROPERTIES_ARGUMENT);
-	//check if player owns those properties
-	//check if properties are mortgaged
-	//unmortgage those properties
-	app.ask('OK, I unmortgaged ' + properties);
+	var msg = '';
+
+	var curr_player_index = app.data.current_player_index;
+	var curr_player_name = app.data.player_names[curr_player_index];
+	var curr_player = game.players[curr_player_name];
+
+	for(i = 0; i < properties.length; i++) {
+		var prop_obj = game.getProperty(properties[i]);
+		msg += GameObjects.mortgageProperty(curr_player, prop_obj);
+	}
+	app.ask(msg);
 }
 
 function get_property_owner(app) {
 	var property = app.getArgument(PROPERTIES_ARGUMENT);
+	var property_obj = game.getProperty(property);
 	//loop through properties and list out their owners
 	//if the property list is greater than the number of players, list the properties by player e.g. nick owns parkplace and vermont
-	app.ask(property + ' is owned by ' + app.data.player_names[0]);
+	if (property_obj.get_owner() == undefined) {
+		app.ask("nobody owns " + property);
+	} else {
+		app.ask(property + ' is owned by ' + property_obj.get_owner());
+	}
+
 }
 
 function build_house(app) {
