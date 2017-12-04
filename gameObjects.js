@@ -172,8 +172,10 @@ module.exports = {
         },
 
     passGo: function(player){
-        console.log("Collected $200 for passing Go!");
+        var msg = '';
+        console.log("Collected $200 for passing Go!"); msg += "Collected $200 for passing Go!";
         player.set_cash(player.get_cash() + 200);
+        return msg;
     },
 
     // Calculate the net worth of a player. Doesn't handle houses and hotels, just yet.
@@ -202,14 +204,14 @@ module.exports = {
 
     // Mortage properties.
     mortgageProperty: function(player, property){
-
+        var msg = '';
         // Easy way to refer to the properties a player has.
         var properties = player.get_prop_list();
         var mortgaged = property.is_mortgaged();
 
         if (mortgaged){
-            console.log("This property is already mortgaged.");
-            return;
+            console.log("This property is already mortgaged."); msg += "This property is already mortgaged.";
+            return msg;
         }
 
         // Check to see if the player actually owns the property in question.
@@ -219,15 +221,18 @@ module.exports = {
 
         	// Add the mortage price of the property to the player's cash.
         	player.set_cash(player.get_cash() + property.get_mortgage_price());
-                console.log("You mortgaged + " + property.get_name() + " for $" + property.get_mortgage_price() + ".");
-        	console.log("You now have $" + player.get_cash() + ".");
+          console.log("You mortgaged " + property.get_name() + " for $" + property.get_mortgage_price() + "."); msg += "You mortgaged " + property.get_name() + " for $" + property.get_mortgage_price() + ".";
+        	console.log("You now have $" + player.get_cash() + "."); msg += "You now have $" + player.get_cash() + ".";
         }
 
         else
-            console.log("You do not own " + property.get_name + ". Cancelling mortgage.");
+            console.log("You do not own " + property.get_name() + ". Cancelling mortgage."); msg += "You do not own " + property.get_name() + ". Cancelling mortgage.";
+
+        return msg;
     },
 
     unmortgageProperty: function(player, property){
+        var msg = '';
 
         // Easy way to refer to the properties a player has.
         var properties = player.get_prop_list();
@@ -235,8 +240,8 @@ module.exports = {
         var cost = property.get_unmortgage_price();
 
         if (!mortgaged){
-            console.log("This property is not mortgaged, so there's no need to unmortgage it.");
-            return;
+            console.log("This property is not mortgaged, so there's no need to unmortgage it."); msg += "This property is not mortgaged, so there's no need to unmortgage it.";
+            return msg;
         }
 
        if (player.get_cash() >= cost){
@@ -248,19 +253,25 @@ module.exports = {
 
                     // Add the mortage price of the property to the player's cash.
                     player.set_cash(player.get_cash() - property.get_unmortgage_price());
-                    console.log("You unmortgaged " + property.get_name() + " for $" + property.get_mortgage_price() + ".");
-                    console.log("You now have $" + player.get_cash() + ".");
+                    console.log("You unmortgaged " + property.get_name() + " for $" + property.get_mortgage_price() + "."); msg += "You unmortgaged " + property.get_name() + " for $" + property.get_mortgage_price() + ".";
+                    console.log("You now have $" + player.get_cash() + "."); msg += "You now have $" + player.get_cash() + ".";
             }
-            else
-                console.log("You do not own " + property.get_name + ". Cancelling mortgage.");
+            else {
+                console.log("You do not own " + property.get_name() + ". Cancelling mortgage."); msg += "You do not own " + property.get_name() + ". Cancelling mortgage.";
+            }
         }
 
-        else
-            console.log("You cannot afford to unmortgage this property.");
+        else {
+          console.log("You cannot afford to unmortgage this property."); msg += "You cannot afford to unmortgage this property.";
+        }
+
+
+        return msg;
     },
 
     // Buy one building on the passed property
     buyBuilding: function(player, property){
+        var msg = '';
 
         var monopoly = property.is_monopoly();
         var propBuildings = property.get_num_buildings();
@@ -269,25 +280,25 @@ module.exports = {
         var numHotels = module.exports.numHotels;
 
         if (player.get_cash() < property.get_build_cost()){
-            console.log("You cannot afford to build on this property.\n");
-            return;
+            console.log("You cannot afford to build on this property.\n"); msg += "You cannot afford to build on this property.\n";
+            return msg;
         }
 
         if (!property.get_owner() || property.get_owner() !== player){
-            console.log("You do not own this property.");
-            return;
+            console.log("You do not own this property."); msg += "You do not own this property.";
+            return msg;
         }
 
         //Check to see if there is a monopoly on a property
         if(!monopoly){
-            console.log("You cannot build on " + property.get_name() + " because you do not have a monopoly on this color-group.");
-            return;
+            console.log("You cannot build on " + property.get_name() + " because you do not have a monopoly on this color-group."); msg += "You cannot build on " + property.get_name() + " because you do not have a monopoly on this color-group.";
+            return msg;
         }
 
         //Too many buildings
         if (propBuildings === 5){
-            console.log("You cannot build any more buildings on this property.");
-            return;
+            console.log("You cannot build any more buildings on this property."); msg += "You cannot build any more buildings on this property.";
+            return msg;
         }
 
         var playerProperties = player.get_prop_list();
@@ -318,29 +329,29 @@ module.exports = {
                 if (propBuildings < 4){
 
                     if (numHouses === 0){
-                        console.log("Sorry, there are no houses left in the bank.");
-                        return;
+                        console.log("Sorry, there are no houses left in the bank."); msg += "Sorry, there are no houses left in the bank.";
+                        return msg;
                     }
 
-                    console.log("Building a house on " + property.get_name() + " for $" + cost + ".");
+                    console.log("Building a house on " + property.get_name() + " for $" + cost + "."); msg += "Building a house on " + property.get_name() + " for $" + cost + ".";
                     property.set_num_buildings(property.get_num_buildings() + 1);
                     player.set_cash(player.get_cash() - cost);
                     player.set_num_houses(player.get_num_houses() + 1);
-                    console.log("Take a house from the bank and put it on the property.");
+                    console.log("Take a house from the bank and put it on the property."); msg += "Take a house from the bank and put it on the property.";
                     module.exports.numHouses--;
                 }
 
                 else if (propBuildings === 4){
 
                     if (numHotels === 0){
-                        console.log("Sorry, there are no hotels left in the bank.");
-                        return;
+                        console.log("Sorry, there are no hotels left in the bank."); msg += "Sorry, there are no hotels left in the bank.";
+                        return msg;
                     }
 
-                    console.log("Bulding a hotel on " + property.get_name() + " for $" + cost + ".");
+                    console.log("Bulding a hotel on " + property.get_name() + " for $" + cost + "."); msg += "Bulding a hotel on " + property.get_name() + " for $" + cost + ".";
                     property.set_num_buildings(property.get_num_buildings() + 1);
                     player.set_cash(player.get_cash() - cost);
-                    console.log("Take a hotel from the bank and put it on the property. Return your houses to the bank.");
+                    console.log("Take a hotel from the bank and put it on the property. Return your houses to the bank."); msg += "Take a hotel from the bank and put it on the property. Return your houses to the bank.";
                     player.set_num_houses(player.get_num_houses() - 4);
                     player.set_num_hotels(player.get_num_hotels() + 1);
                     module.exports.numHotels--;
@@ -348,8 +359,9 @@ module.exports = {
                 }
             }
 
-            else
-                console.log("You can't build on this property because you don't have enough buildings on the other property in this color-group.");
+            else {
+                console.log("You can't build on this property because you don't have enough buildings on the other property in this color-group."); msg += "You can't build on this property because you don't have enough buildings on the other property in this color-group.";
+            }
         }
 
         //Color-groups with three properties
@@ -371,14 +383,14 @@ module.exports = {
                 if (propBuildings < 4){
 
                     if (numHouses === 0){
-                        console.log("Sorry, there are no houses left in the bank.");
-                        return;
+                        console.log("Sorry, there are no houses left in the bank."); msg += "Sorry, there are no houses left in the bank.";
+                        return msg;
                     }
 
-                    console.log("Building a house on " + property.get_name() + " for $" + cost + ".");
+                    console.log("Building a house on " + property.get_name() + " for $" + cost + "."); msg += "Building a house on " + property.get_name() + " for $" + cost + ".";
                     property.set_num_buildings(property.get_num_buildings() + 1);
                     player.set_cash(player.get_cash() - cost);
-                    console.log("Take a house from the bank and put it on the property.");
+                    console.log("Take a house from the bank and put it on the property."); msg += "Take a house from the bank and put it on the property.";
                     player.set_num_houses(player.get_num_houses() + 1);
                     module.exports.numHouses--;
                 }
@@ -386,14 +398,14 @@ module.exports = {
                 else if (propBuildings === 4){
 
                     if (numHotels === 0){
-                        console.log("Sorry, there are no hotels left in the bank.");
-                        return;
+                        console.log("Sorry, there are no hotels left in the bank."); msg += "Sorry, there are no hotels left in the bank.";
+                        return msg;
                     }
 
-                    console.log("Building a hotel on " + property.get_name() + " for $" + cost + ".");
+                    console.log("Building a hotel on " + property.get_name() + " for $" + cost + "."); msg += "Building a hotel on " + property.get_name() + " for $" + cost + ".";
                     property.set_num_buildings(property.get_num_buildings() + 1);
                     player.set_cash(player.get_cash() - cost);
-                    console.log("Take a hotel from the bank and put it on the property. Return your houses to the bank.");
+                    console.log("Take a hotel from the bank and put it on the property. Return your houses to the bank."); msg += "Take a hotel from the bank and put it on the property. Return your houses to the bank.";
                     player.set_num_houses(player.get_num_houses() - 4);
                     player.set_num_hotels(player.get_num_hotels() + 1);
                     module.exports.numHotels--;
@@ -402,24 +414,28 @@ module.exports = {
             }
 
             //Check if not building evenly
-            else
-                console.log("You can't build on this property because you don't have enough buildings on the other properties in this color-group.");
+            else {
+                console.log("You can't build on this property because you don't have enough buildings on the other properties in this color-group."); msg += "You can't build on this property because you don't have enough buildings on the other properties in this color-group.";
+            }
         }
+
+        return msg;
 
     },
 
     sellBuilding: function(player, property){
+        var msg = '';
 
         var propBuildings = property.get_num_buildings();
 
         if (!property.get_owner() || property.get_owner() !== player){
-            console.log("You do not own this property.");
-            return;
+            console.log("You do not own this property."); msg += "You do not own this property.";
+            return msg;
         }
 
         if (propBuildings === 0){
-            console.log("You have no buildings on this property.");
-            return;
+            console.log("You have no buildings on this property."); msg += "You have no buildings on this property.";
+            return msg;
         }
 
         var playerProperties = player.get_prop_list();
@@ -449,20 +465,20 @@ module.exports = {
 
                 if (propBuildings <= 4){
 
-                    console.log("Selling a house on " + property.get_name() + " for $" + cost/2 + ".");
+                    console.log("Selling a house on " + property.get_name() + " for $" + cost/2 + "."); msg += "Selling a house on " + property.get_name() + " for $" + cost/2 + ".";
                     property.set_num_buildings(property.get_num_buildings() - 1);
                     player.set_cash(player.get_cash() + cost/2);
-                    console.log("Please return the house to the bank.");
+                    console.log("Please return the house to the bank."); msg += "Please return the house to the bank.";
                     player.set_num_houses(player.get_num_houses() - 1);
                     module.exports.numHouses++;
                 }
 
                 else if (propBuildings === 5){
 
-                    console.log("Selling a hotel on " + property.get_name() + " for $" + cost/2 + ".");
+                    console.log("Selling a hotel on " + property.get_name() + " for $" + cost/2 + "."); msg += "Selling a hotel on " + property.get_name() + " for $" + cost/2 + ".";
                     property.set_num_buildings(property.get_num_buildings() - 1);
                     player.set_cash(player.get_cash() + cost/2);
-                    console.log("Please return the hotel to the bank. And place 4 houses on the property.");
+                    console.log("Please return the hotel to the bank. And place 4 houses on the property."); msg += "Please return the hotel to the bank. And place 4 houses on the property.";
                     player.set_num_houses(player.get_num_houses() + 4);
                     player.set_num_hotels(player.get_num_hotels() - 1);
                     module.exports.numHotels--;
@@ -471,8 +487,9 @@ module.exports = {
 
             }
 
-            else
-                console.log("You can't sell on this property because you have too many buildings on the other property in this color-group.");
+            else {
+                console.log("You can't sell on this property because you have too many buildings on the other property in this color-group."); msg += "You can't sell on this property because you have too many buildings on the other property in this color-group.";
+            }
         }
 
         //Color-groups with three properties
@@ -494,20 +511,20 @@ module.exports = {
                 //Selling houses
                 if (propBuildings <= 4){
 
-                    console.log("Selling a house on " + property.get_name() + " for $" + cost/2 + ".");
+                    console.log("Selling a house on " + property.get_name() + " for $" + cost/2 + "."); msg += "Selling a house on " + property.get_name() + " for $" + cost/2 + ".";
                     property.set_num_buildings(property.get_num_buildings() - 1);
                     player.set_cash(player.get_cash() + cost/2);
-                    console.log("Please return the house to the bank.");
+                    console.log("Please return the house to the bank."); msg += "Please return the house to the bank.";
                     player.set_num_houses(player.get_num_houses() - 1);
                     module.exports.numHouses--;
                 }
 
                 else if (propBuildings === 5){
 
-                    console.log("Selling a hotel on " + property.get_name() + " for $" + cost/2 + ".");
+                    console.log("Selling a hotel on " + property.get_name() + " for $" + cost/2 + "."); msg += "Selling a hotel on " + property.get_name() + " for $" + cost/2 + ".";
                     property.set_num_buildings(property.get_num_buildings() - 1);
                     player.set_cash(player.get_cash() + cost/2);
-                    console.log("Please return the hotel to the bank. And place 4 houses on the property.");
+                    console.log("Please return the hotel to the bank. And place 4 houses on the property."); msg += "Please return the hotel to the bank. And place 4 houses on the property.";
                     player.set_num_houses(player.get_num_houses() + 4);
                     player.set_num_hotels(player.get_num_hotels() - 1);
                     module.exports.numHotels--;
@@ -516,14 +533,19 @@ module.exports = {
             }
 
             //Check if not building evenly
-            else
-                console.log("You can't sell on this property because have too many buildings on the other properties in this color-group.");
+            else  {
+                console.log("You can't sell on this property because have too many buildings on the other properties in this color-group."); msg += "You can't sell on this property because have too many buildings on the other properties in this color-group.";
+            }
         }
+
+        return msg;
 
     },
 
     // Jail function
     jail: function(currPlayer, board, players, chanceCards, chestCards){
+
+        var msg = '';
 
         var player = currPlayer;
         player.set_space(10);
@@ -534,21 +556,22 @@ module.exports = {
 
         //This will trigger when you are sent to jail via 1/3 options
         if (jailTurn === 0){
-            console.log("You have been sent to jail. Ending your turn.");
+            console.log("You have been sent to jail. Ending your turn."); msg += "You have been sent to jail. Ending your turn.";
             player.set_jail_turn(1);
         }
 
         //This should be triggered when a player want
         else if (jailTurn === 1){
-            console.log("You are in jail, so you won't be able to move until you are free.");
-            console.log("You can get out immediately if you roll doubles,");
-            console.log("or you can pay $50 and move next turn.");
-            console.log("If you fail to roll doubles on your third attempt, you will still have to pay $50.");
+            console.log("You are in jail, so you won't be able to move until you are free."); msg += "You are in jail, so you won't be able to move until you are free.";
+            console.log("You can get out immediately if you roll doubles,"); msg += "You can get out immediately if you roll doubles,";
+            console.log("or you can pay $50 and move next turn."); msg += "or you can pay $50 and move next turn.";
+            console.log("If you fail to roll doubles on your third attempt, you will still have to pay $50."); msg += "If you fail to roll doubles on your third attempt, you will still have to pay $50.";
 
-            if (chanceJail || chestJail)
-                console.log("You could also use your \"Get out of Jail Free\" card.");
+            if (chanceJail || chestJail) {
+                console.log("You could also use your \"Get out of Jail Free\" card."); msg += "You could also use your \"Get out of Jail Free\" card.";
+            }
 
-            console.log("How do you want to get out?\n");
+            console.log("How do you want to get out?\n"); msg += "How do you want to get out?\n";
 
             //Response from DialogFlow should be "roll dice", "pay fine", "use card"
             var answer = "roll";     //For testing
@@ -558,11 +581,12 @@ module.exports = {
                 if (player.get_cash() >= 50){
                     player.set_cash(player.get_cash() - 50);
                     player.set_jail_turn(0);
-                    console.log("You have been released. Move to the \"Just Vistiing\" section. Ending your turn.");
+                    console.log("You have been released. Move to the \"Just Vistiing\" section. Ending your turn."); msg += "You have been released. Move to the \"Just Vistiing\" section. Ending your turn.";
                 }
 
-                else
-                    console.log("You cannot afford to pay the fine.");
+                else {
+                    console.log("You cannot afford to pay the fine."); msg += "You cannot afford to pay the fine.";
+                }
             }
 
             else if (answer === "card"){
@@ -574,7 +598,7 @@ module.exports = {
                     player.take_chanceJail();
                     newSpace = module.exports.getNewSpace(player, board, diceSum);
                     player.set_jail_turn(0);
-                    console.log("Please return your card to the board.");
+                    console.log("Please return your card to the board."); msg += "Please return your card to the board.";
                     module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
                 }
 
@@ -582,17 +606,17 @@ module.exports = {
                     player.take_chestJail();
                     newSpace = module.exports.getNewSpace(player, board, diceSum);
                     player.set_jail_turn(0);
-                    console.log("Please return your card to the board.");
+                    console.log("Please return your card to the board."); msg += "Please return your card to the board.";
                     module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
                 }
 
                 else if (chestJail && chanceJail){
-                    console.log("Which card would you like to use?");
+                    console.log("Which card would you like to use?"); msg += "Which card would you like to use?";
 
                     //Need response from DialogFlow
                     var card = "chance";    //For testing
 
-                    console.log("Please return your card to the board.");
+                    console.log("Please return your card to the board."); msg += "Please return your card to the board.";
 
                     if (card === "chance"){
                         player.take_chanceJail();
@@ -617,28 +641,29 @@ module.exports = {
                 //If doubles are rolled, immediately move out, but don't let roll again.
                 if (doubles){
                     newSpace = module.exports.getNewSpace(player, board, diceSum);
-                    console.log("You rolled doubles!\n");
+                    console.log("You rolled doubles!\n"); msg += "You rolled doubles!\n";
                     player.set_jail_turn(0);
                     module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
                 }
 
                 else{
-                    console.log("Sorry, you did not roll doubles. Ending your turn.");
+                    console.log("Sorry, you did not roll doubles. Ending your turn."); msg += "Sorry, you did not roll doubles. Ending your turn.";
                     player.set_jail_turn(2);
                 }
             }
         }
 
         else if (jailTurn === 2){
-            console.log("You are in jail, so you won't be able to move until you are free.");
-            console.log("You can get out immediately if you roll doubles,");
-            console.log(" or you can pay $50 and get out next turn.");
-            console.log("If you fail to roll doubles on your third attempt, you will still have to pay $50.");
+            console.log("You are in jail, so you won't be able to move until you are free."); msg += "You are in jail, so you won't be able to move until you are free.";
+            console.log("You can get out immediately if you roll doubles,"); msg += "You can get out immediately if you roll doubles,";
+            console.log(" or you can pay $50 and get out next turn."); msg += " or you can pay $50 and get out next turn.";
+            console.log("If you fail to roll doubles on your third attempt, you will still have to pay $50."); msg += "If you fail to roll doubles on your third attempt, you will still have to pay $50.";
 
-            if (chanceJail || chestJail)
-                console.log("You could also use your \"Get out of Jail Free\" card.");
+            if (chanceJail || chestJail) {
+                console.log("You could also use your \"Get out of Jail Free\" card."); msg += "You could also use your \"Get out of Jail Free\" card.";
+            }
 
-            console.log("How do you want to get out?");
+            console.log("How do you want to get out?"); msg += "How do you want to get out?";
 
             //Response from DialogFlow should be "roll dice", "pay fine", "use card"
             var answer = "pay";     //For testing
@@ -648,11 +673,12 @@ module.exports = {
                 if (player.get_cash() >= 50){
                     player.set_cash(player.get_cash() - 50);
                     player.set_jail_turn(0);
-                    console.log("You have been released. Move to the \"Just Vistiing\" section. Ending your turn.");
+                    console.log("You have been released. Move to the \"Just Vistiing\" section. Ending your turn."); msg += "You have been released. Move to the \"Just Vistiing\" section. Ending your turn.";
                 }
 
-                else
-                    console.log("You cannot afford to pay the fine.");
+                else {
+                    console.log("You cannot afford to pay the fine."); msg += "You cannot afford to pay the fine.";
+                }
             }
 
             else if (answer === "card"){
@@ -664,7 +690,7 @@ module.exports = {
                     player.take_chanceJail();
                     newSpace = module.exports.getNewSpace(player, board, diceSum);
                     player.set_jail_turn(0);
-                    console.log("Please return your card to the board.");
+                    console.log("Please return your card to the board."); msg += "Please return your card to the board.";
                     module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
                 }
 
@@ -672,17 +698,17 @@ module.exports = {
                     player.take_chestJail();
                     newSpace = module.exports.getNewSpace(player, board, diceSum);
                     player.set_jail_turn(0);
-                    console.log("Please return your card to the board.");
+                    console.log("Please return your card to the board."); msg += "Please return your card to the board.";
                     module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
                 }
 
                 else if (chestJail && chanceJail){
-                    console.log("Which card would you like to use?");
+                    console.log("Which card would you like to use?"); msg += "Which card would you like to use?";
 
                     //Need response from DialogFlow
                     var card = "chance";    //For testing
 
-                    console.log("Please return your card to the board.");
+                    console.log("Please return your card to the board."); msg += "Please return your card to the board.";
 
                     if (card === "chance"){
                         player.take_chanceJail();
@@ -707,13 +733,13 @@ module.exports = {
                 //If doubles are rolled, immediately move out, but don't let roll again.
                 if (doubles){
                     newSpace = module.exports.getNewSpace(player, board, diceSum);
-                    console.log("You rolled doubles!");
+                    console.log("You rolled doubles!"); msg += "You rolled doubles!";
                     player.set_jail_turn(0);
                     module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
                 }
 
                 else{
-                    console.log("Sorry, you did not roll doubles. Ending your turn.");
+                    console.log("Sorry, you did not roll doubles. Ending your turn."); msg += "Sorry, you did not roll doubles. Ending your turn.";
                     player.set_jail_turn(3);
                 }
             }
@@ -721,14 +747,15 @@ module.exports = {
 
         else if (jailTurn === 3){
 
-            console.log("This is your last turn in Jail.");
-            console.log("You can try to role doubles one more time, ");
-            console.log("but if you fail to do so, you'll have to pay the $50.");
+            console.log("This is your last turn in Jail."); msg += "This is your last turn in Jail.";
+            console.log("You can try to role doubles one more time, "); msg += "You can try to role doubles one more time, ";
+            console.log("but if you fail to do so, you'll have to pay the $50."); msg += "but if you fail to do so, you'll have to pay the $50.";
 
-            if (chanceJail || chestJail)
-                console.log("You could also use your \"Get out of Jail Free\" card.");
+            if (chanceJail || chestJail) {
+                console.log("You could also use your \"Get out of Jail Free\" card."); msg += "You could also use your \"Get out of Jail Free\" card.";
+            }
 
-            console.log("How do you want to get out?");
+            console.log("How do you want to get out?"); msg += "How do you want to get out?";
 
             //Response from DialogFlow should be "roll dice", "use card"
             var answer = "roll";     //For testing
@@ -738,7 +765,7 @@ module.exports = {
                 if (player.get_cash() >= 50){
                     player.set_cash(player.get_cash() - 50);
                     player.set_jail_turn(0);
-                    console.log("You have been released. Move to the \"Just Vistiing\" section. Ending your turn.");
+                    console.log("You have been released. Move to the \"Just Vistiing\" section. Ending your turn."); msg += "You have been released. Move to the \"Just Vistiing\" section. Ending your turn.";
                 }
 
                 else
@@ -754,7 +781,7 @@ module.exports = {
                     player.take_chanceJail();
                     newSpace = module.exports.getNewSpace(player, board, diceSum);
                     player.set_jail_turn(0);
-                    console.log("Please return your card to the board.");
+                    console.log("Please return your card to the board."); msg += "Please return your card to the board.";
                     module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
                 }
 
@@ -762,17 +789,17 @@ module.exports = {
                     player.take_chestJail();
                     newSpace = module.exports.getNewSpace(player, board, diceSum);
                     player.set_jail_turn(0);
-                    console.log("Please return your card to the board.");
+                    console.log("Please return your card to the board."); msg += "Please return your card to the board.";
                     module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
                 }
 
                 else if (chestJail && chanceJail){
-                    console.log("Which card would you like to use?");
+                    console.log("Which card would you like to use?"); msg += "Which card would you like to use?";
 
                     //Need response from DialogFlow
                     var card = "chance";    //For testing
 
-                    console.log("Please return your card to the board.");
+                    console.log("Please return your card to the board."); msg += "Please return your card to the board.";
 
                     if (card === "chance"){
                         player.take_chanceJail();
@@ -797,13 +824,13 @@ module.exports = {
                 //If doubles are rolled, immediately move out, but don't let roll again.
                 if (doubles){
                     newSpace = module.exports.getNewSpace(player, board, diceSum);
-                    console.log("You rolled doubles!");
+                    console.log("You rolled doubles!"); msg += "You rolled doubles!";
                     player.set_jail_turn(0);
                     module.exports.movePlayer(player, board, players, diceSum, newSpace, chanceCards, chestCards);
                 }
 
                 else{
-                    console.log("Sorry, you did not roll doubles. You must pay $50, and move according to the dice.");
+                    console.log("Sorry, you did not roll doubles. You must pay $50, and move according to the dice."); msg += "Sorry, you did not roll doubles. You must pay $50, and move according to the dice.";
                     newSpace = module.exports.getNewSpace(player, board, diceSum);
                     player.set_cash(player.get_cash() - 50);
                     player.set_jail_turn(0);
@@ -811,17 +838,21 @@ module.exports = {
                 }
             }
         }
+
+        return msg;
     },
 
     //Finds action associated with passed chance card
     chanceAction: function(card, currPlayer, players, gameBoard, chanceCards, chestCards){
+
+        var msg = '';
 
         var id = card.get_id();
         var action = card.get_action();
         var player = currPlayer;
         var players = players;
 
-        console.log(card.get_text() + "\n");
+        console.log(card.get_text() + "\n"); msg += card.get_text();
 
         if (action === "pay"){
             var payment = 0;
@@ -845,13 +876,13 @@ module.exports = {
                         console.log("Payed $50 to " + players[i].get_name());
                     }
                 }
-                console.log("You now have $" + player.get_cash() + "\n");
-                return;
+                console.log("You now have $" + player.get_cash() + "\n"); msg += "You now have $" + player.get_cash() + "\n";
+                return msg;
             }
             if (module.exports.hasCash(player, payment)){
                 player.set_cash(player.get_cash() - payment);
-                console.log("Your payment is $" + payment);
-                console.log("You now have $" + player.get_cash() + "\n");
+                console.log("Your payment is $" + payment); msg += "Your payment is $" + payment;
+                console.log("You now have $" + player.get_cash() + "\n"); msg += "You now have $" + player.get_cash() + "\n";
             }
 
             else
@@ -871,13 +902,13 @@ module.exports = {
             //Get Jail card
             else if (id === "getOutJail"){
                 player.give_chanceJail();
-                console.log("You received a \"Get out of Jail Free\" card!\n");
-                return;
+                console.log("You received a \"Get out of Jail Free\" card!\n"); msg += "You received a \"Get out of Jail Free\" card!\n";
+                return msg;
             }
 
             player.set_cash(player.get_cash() + amount);
-            console.log("You received $" + amount);
-            console.log("You now have $" + player.get_cash() + "\n");
+            console.log("You received $" + amount); msg += "You received $" + amount;
+            console.log("You now have $" + player.get_cash() + "\n"); msg += "You now have $" + player.get_cash() + "\n";
         }
 
         else if (action === "move"){
@@ -952,17 +983,21 @@ module.exports = {
             else if (id === "goBack")
                 module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[player.get_space() - 3]);
         }
+
+        return msg;
     },
 
     //Finds action associated with passed chest card
     chestAction: function(card, currPlayer, players, gameBoard, chanceCards, chestCards){
+
+        var msg = '';
 
         var id = card.get_id();
         var action = card.get_action();
         var player = currPlayer;
         var players = players;
 
-        console.log(card.get_text() + "\n");
+        console.log(card.get_text() + "\n"); msg += card.get_text();
 
         if (action === "pay"){
             var payment = 0;
@@ -986,8 +1021,8 @@ module.exports = {
 
             if (module.exports.hasCash(player, payment)){
                 player.set_cash(player.get_cash() - payment);
-                console.log("Your payment is $" + payment);
-                console.log("You now have $" + player.get_cash() + "\n");
+                console.log("Your payment is $" + payment); msg += "Your payment is $" + payment;
+                console.log("You now have $" + player.get_cash() + "\n"); msg += "You now have $" + player.get_cash() + "\n";
             }
 
             else
@@ -1010,8 +1045,8 @@ module.exports = {
             //Get jail card
             else if (id === "getOutJail"){
                 player.give_chestJail();
-                console.log("You received a \"Get out of Jail Free\" card!\n");
-                return;
+                console.log("You received a \"Get out of Jail Free\" card!\n"); msg += "You received a \"Get out of Jail Free\" card!\n";
+                return msg;
             }
 
             else if (id === "inherit")
@@ -1029,19 +1064,19 @@ module.exports = {
                     if (players[i].get_name() !== player.get_name()){
                         players[i].set_cash(players[i].get_cash() - 50);
                         player.set_cash(player.get_cash() + 50);
-                        console.log("Collected $50 from " + players[i].get_name());
+                        console.log("Collected $50 from " + players[i].get_name()); msg += "Collected $50 from " + players[i].get_name();
                     }
                 }
-                console.log("You now have $" + player.get_cash() + "\n");
-                return;
+                console.log("You now have $" + player.get_cash() + "\n"); msg += "You now have $" + player.get_cash() + "\n";
+                return msg;
             }
 
             else if (id === "insurance")
                 amount = 100;
 
             player.set_cash(player.get_cash() + amount);
-            console.log("You collected $" + amount);
-            console.log("You now have $" + player.get_cash() + "\n");
+            console.log("You collected $" + amount); msg += "You collected $" + amount;
+            console.log("You now have $" + player.get_cash() + "\n"); msg += "You now have $" + player.get_cash() + "\n";
         }
 
         else if (action === "move"){
@@ -1051,10 +1086,13 @@ module.exports = {
             else if (id === "advGo")
                 module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[0]);
         }
+
+        return msg;
     },
 
     //Triggers when you land on a property space
     propertySpace: function(space, currPlayer, players, diceSum){
+        var msg = '';
         var space = space;
         var player = currPlayer;
         var property = space.get_prop();
@@ -1068,9 +1106,9 @@ module.exports = {
 
             //If player has enough to buy
             if (module.exports.hasCash(player, property.get_price())){
-                console.log("This property has no owner.");
-                console.log("You may buy it from the bank for $" + price + ",");
-                console.log("or put it up for auction.");
+                console.log("This property has no owner."); msg += "This property has no owner.";
+                console.log("You may buy it from the bank for $" + price + ","); msg += "You may buy it from the bank for $" + price + ",";
+                console.log("or put it up for auction."); msg += "or put it up for auction.";
 
                 //Not quite sure how to get answer from user here
                 //Dileep, you can decide how to get the answer
@@ -1088,8 +1126,9 @@ module.exports = {
                     property.set_owner(player);
                     player.properties.push(property);
                     console.log("You successfully purchased " + property.get_name()
-                            + " for " + "$" + price + ".");
-                    console.log("You now have $" + player.get_cash() + ".\n");
+                            + " for " + "$" + price + "."); msg += "You successfully purchased " + property.get_name()
+                                    + " for " + "$" + price + ".";
+                    console.log("You now have $" + player.get_cash() + ".\n"); msg += "You now have $" + player.get_cash() + ".\n";
 
                     //Check to see if purchase activates monopoly
                     if (group !== "railroad" || group === "utility"){
@@ -1109,8 +1148,8 @@ module.exports = {
 
                         if (color === "purple" || color === "dark-blue"){
                             if (colorProps.length === 1){
-                                console.log("You now have a monopoly on the " + color + " color-group!");
-                                console.log("You can now build on these properties and earn double the base rent!\n");
+                                console.log("You now have a monopoly on the " + color + " color-group!"); msg += "You now have a monopoly on the " + color + " color-group!";
+                                console.log("You can now build on these properties and earn double the base rent!\n"); msg += "You can now build on these properties and earn double the base rent!\n";
 
                                 property.set_monopoly_true();
                                 colorProps[0].set_monopoly_true();
@@ -1119,8 +1158,8 @@ module.exports = {
 
                         else{
                             if (colorProps.length === 2){
-                                console.log("You now have a monopoly on the " + color + " color-group!");
-                                console.log("You can now build on these properties and earn double the base rent!\n");
+                                console.log("You now have a monopoly on the " + color + " color-group!"); msg += "You now have a monopoly on the " + color + " color-group!";
+                                console.log("You can now build on these properties and earn double the base rent!\n"); msg += "You can now build on these properties and earn double the base rent!\n";
 
                                 property.set_monopoly_true();
                                 colorProps[0].set_monopoly_true();
@@ -1129,14 +1168,16 @@ module.exports = {
                         }
                     }
                 }
-                else
-                    console.log("This property will remain unsold.");
+                else {
+                    console.log("This property will remain unsold."); msg += "This property will remain unsold.";
+                }
+
             }
 
             //if player has insufficient
             else if (cash < price){
-                console.log("You don't have enough money to purchase this property.");
-                console.log("This property will remain unsold.");
+                console.log("You don't have enough money to purchase this property."); msg += "You don't have enough money to purchase this property.";
+                console.log("This property will remain unsold."); msg += "This property will remain unsold.";
             }
         }
 
@@ -1144,7 +1185,7 @@ module.exports = {
             var i = players.indexOf(owner);
             owner = players[i];
 
-            console.log("This property is owned by " + owner.get_name() + ".");
+            console.log("This property is owned by " + owner.get_name() + "."); msg += "This property is owned by " + owner.get_name() + ".";
 
             var group = property.get_group();
             var cash = player.get_cash();
@@ -1171,7 +1212,7 @@ module.exports = {
                 if (cash >= rent){
                     player.set_cash(player.get_cash() - rent);
                     console.log("Your payment is $" + rent);
-                    console.log("You now have $" + player.get_cash() + "\n");
+                    console.log("You now have $" + player.get_cash() + "\n"); msg += "You now have $" + player.get_cash() + "\n";
                 }
 
                 else
@@ -1194,8 +1235,8 @@ module.exports = {
 
                 if (cash >= rent){
                     player.set_cash(player.get_cash() - rent);
-                    console.log("Your payment is $" + rent);
-                    console.log("You now have $" + player.get_cash() + "\n");
+                    console.log("Your payment is $" + rent); msg += "Your payment is $" + rent;
+                    console.log("You now have $" + player.get_cash() + "\n"); msg += "You now have $" + player.get_cash() + "\n";
                 }
 
                 else
@@ -1234,12 +1275,12 @@ module.exports = {
                     if (cash >= rent){
                         owner.set_cash(owner.get_cash() + rent);
                         player.set_cash(player.get_cash() - rent);
-                        console.log("You payed " + owner.get_name() + " $" + rent);
-                        console.log("You now have $" + player.get_cash());
+                        console.log("You payed " + owner.get_name() + " $" + rent); msg += "You payed " + owner.get_name() + " $" + rent;
+                        console.log("You now have $" + player.get_cash()); msg += "You now have $" + player.get_cash())
                     }
 
                     else if (cash < rent){
-                        console.log("You need an additional $" + rent - price);
+                        console.log("You need an additional $" + rent - price); msg += "You need an additional $" + rent - price;
                         /* trigger bankruptcy function
                          * if player can't pay owner, player forfeits all
                          * assets to owner
@@ -1264,11 +1305,13 @@ module.exports = {
         }
 
         else
-            console.log("You own this property!");
+            console.log("You own this property!"); msg += "You own this property!";
+
+        return msg;
     },
 
     actionSpace: function(space, currPlayer, players, gameBoard, chanceCards, chestCards){
-
+        var msg = '';
         var id = space.get_id();
         var player = currPlayer;
 
@@ -1285,64 +1328,66 @@ module.exports = {
             //We still need to check for bankruptcy somehwere in here
 
             if (percent > 200){
-                console.log("10% of your net worth amounts to $" + percent + ".");
-                console.log("So we'll charge you $200 instead.");
+                console.log("10% of your net worth amounts to $" + percent + "."); msg += "10% of your net worth amounts to $" + percent + ".";
+                console.log("So we'll charge you $200 instead."); msg += "So we'll charge you $200 instead.";
 
                 if (player.get_cash() >= percent){
                     player.set_cash(player.get_cash() - percent);
-                    console.log("Your payment is $" + percent);
-                    console.log("You now have $" + player.get_cash() + "\n");
+                    console.log("Your payment is $" + percent); msg += "You now have $" + player.get_cash() + "\n";
+                    console.log("You now have $" + player.get_cash() + "\n"); msg += "You now have $" + player.get_cash() + "\n";
                 }
 
                 else
                     module.exports.bankruptcy(player, percent, players);
             }
             else{
-                console.log("10% of your net worth amounts to $" + percent + ".");
-                console.log("So we'll charge you that amount instead of $200.\n");
+                console.log("10% of your net worth amounts to $" + percent + "."); msg += "10% of your net worth amounts to $" + percent + ".";
+                console.log("So we'll charge you that amount instead of $200.\n"); msg += "So we'll charge you that amount instead of $200.\n";
                  if (player.get_cash() >= percent){
                     player.set_cash(player.get_cash() - percent);
                     console.log("Your payment is $" + percent);
-                    console.log("You now have $" + player.get_cash() + "\n");
+                    console.log("You now have $" + player.get_cash() + "\n"); msg += "You now have $" + player.get_cash() + "\n";
                 }
 
                 else
                     module.exports.bankruptcy(player, percent, players);
             }
 
-            console.log("You now have $" + player.get_cash() + ".");
+            console.log("You now have $" + player.get_cash() + "."); msg += "You now have $" + player.get_cash() + ".";
         }
 
         else if (id === "Chance1" || id === "Chance2" || id === "Chance3")
             module.exports.drawChance(chanceCards, player, players, gameBoard, chestCards);
 
-        else if (id === "Jail")
-            console.log("Don't worry, you're not in trouble! You're just visiting.");
-
+        else if (id === "Jail") {
+            console.log("Don't worry, you're not in trouble! You're just visiting."); msg += "Don't worry, you're not in trouble! You're just visiting.";
+        }
         else if (id === "Parking"){
-            console.log("Free Parking!");
-            console.log("Nothing to do here!");
+            console.log("Free Parking!"); msg += "Free Parking!";
+            console.log("Nothing to do here!"); msg += "Nothing to do here!";
         }
 
         else if (id === "GoToJail"){
-            console.log("Go to Jail. Go directly to Jail.");
-            console.log("Do not pass GO. Do not collect $200\n");
+            console.log("Go to Jail. Go directly to Jail."); msg += "Go to Jail. Go directly to Jail.";
+            console.log("Do not pass GO. Do not collect $200\n"); msg += "Do not pass GO. Do not collect $200\n";
             module.exports.jail(player, gameBoard, players, chanceCards, chestCards);
         }
 
         else if (id === "LuxTax"){
             module.exports.bankruptcy(player, 75, players);
-            console.log("Luxury Tax. Pay $75");
+            console.log("Luxury Tax. Pay $75"); msg += "Luxury Tax. Pay $75";
 
              if (player.get_cash() >= 75){
                     player.set_cash(player.get_cash() - 75);
-                    console.log("Your payment is $" + 75);
-                    console.log("You now have $" + player.get_cash() + "\n");
+                    console.log("Your payment is $" + 75); msg += "Your payment is $" + 75;
+                    console.log("You now have $" + player.get_cash() + "\n"); msg += "You now have $" + player.get_cash() + "\n";
                 }
 
             else
                 module.exports.bankruptcy(player, 75, players);
         }
+
+        return msg;
     },
 
     hasCash: function(player, price){
@@ -1356,12 +1401,13 @@ module.exports = {
 
     //Draw chance card from array and call chanceAction()
     drawChance: function(chanceCards, currPlayer, players, board, chestCards){
+        var msg = '';
         var cards = chanceCards;
         var player = currPlayer;
         var players = players;
         var card = cards.shift();  //Remove and return first card in array
 
-        console.log("Drawing Chance card:\n");
+        console.log("Drawing Chance card:\n"); msg += "Drawing Chance card:\n";
 
         //Call chanceAction() function on card
         module.exports.chanceAction(card, player, players, board, chanceCards, chestCards);
@@ -1370,15 +1416,18 @@ module.exports = {
         if (card.get_id() !== "getOutJail"){
             cards.push(card);   //Put card at bottom of deck (end of array)
         }
+
+        return msg;
     },
 
     //Draw chest card from array and call chestAction()
     drawChest: function(chestCards, currPlayer, players, board, chanceCards){
+        var msg = '';
         var cards = chestCards;
         var player = currPlayer;
         var players = players;
 
-        console.log("Drawing Community Chest card:\n");
+        console.log("Drawing Community Chest card:\n"); msg += "Drawing Community Chest card:\n";
 
         var card = cards.shift();  //Remove and return first card in array
 
@@ -1389,6 +1438,8 @@ module.exports = {
         if (card.get_id() !== "getOutJail"){
             cards.push(card);   //Put card at bottom of deck (end of array)
         }
+
+        return msg;
     },
 
     //Rolls dice and returns their sum and double boolean
@@ -1408,22 +1459,23 @@ module.exports = {
 
     // Bankruptcy function.
     bankruptcy: function(player, cost, players, owner){
+        var msg = '';
 
         var cash = player.get_cash();
         //If you owe money to another player
             if (owner){
                 var ownerName = owner.get_name();
-                console.log("You cannot pay " + ownerName + " the money to which he/she is entitled.");
-                console.log("You will need to forfeit the rest of your cash and properties to " + ownerName + ".\n");
+                console.log("You cannot pay " + ownerName + " the money to which he/she is entitled."); msg += "You cannot pay " + ownerName + " the money to which he/she is entitled.";
+                console.log("You will need to forfeit the rest of your cash and properties to " + ownerName + ".\n"); msg += "You will need to forfeit the rest of your cash and properties to " + ownerName + ".\n";
 
-                if (cash <= 0)
-                    console.log("You have no cash to forfeit to " + ownerName + ".");
-
+                if (cash <= 0) {
+                    console.log("You have no cash to forfeit to " + ownerName + "."); msg += "You have no cash to forfeit to " + ownerName + ".";
+                }
                 else{
-                    console.log("Transferring $" + cash + " to " + ownerName + "'s account.");
+                    console.log("Transferring $" + cash + " to " + ownerName + "'s account."); msg += "Transferring $" + cash + " to " + ownerName + "'s account.";
                     player.set_cash(0);
                     owner.set_cash(owner.get_cash() + cash);
-                    console.log(ownerName + " now has $" + owner.get_cash() + ".");
+                    console.log(ownerName + " now has $" + owner.get_cash() + "."); msg += ownerName + " now has $" + owner.get_cash() + ".";
                 }
 
                 var playerProps = player.get_prop_list();
@@ -1440,23 +1492,23 @@ module.exports = {
                 }
 
                 if (numProperties > 0)
-                    console.log(ownerName + " received " + numProperties + " properties.");
+                    console.log(ownerName + " received " + numProperties + " properties."); msg += ownerName + " received " + numProperties + " properties.";
 
                 if (player.get_chanceJail()){
                     owner.give_chanceJail();
-                    console.log(ownerName + " received a \"Get out of Jail Free\" card.");
+                    console.log(ownerName + " received a \"Get out of Jail Free\" card."); msg += ownerName + " received a \"Get out of Jail Free\" card.";
                 }
 
                 if (player.get_chestJail()){
                     owner.give_chestJail();
-                    console.log(ownerName + " received a \"Get out of Jail Free\" card.");
+                    console.log(ownerName + " received a \"Get out of Jail Free\" card."); msg += ownerName + " received a \"Get out of Jail Free\" card.";
                 }
             }
 
             //If you owe money to the bank
             else{
-                console.log("You don't have enough money to pay to the Bank.");
-                console.log("You will need to turn in the rest of your cash and properties to the Bank.\n");
+                console.log("You don't have enough money to pay to the Bank."); msg += "You don't have enough money to pay to the Bank.";
+                console.log("You will need to turn in the rest of your cash and properties to the Bank.\n"); msg += "You will need to turn in the rest of your cash and properties to the Bank.\n";
 
                 var playerProps = player.get_prop_list();
                 var numProperties = playerProps.length;
@@ -1474,9 +1526,11 @@ module.exports = {
                 }
             }
 
-            console.log("\nGame Over\nPlease return your token to the Bank.");
+            console.log("\nGame Over\nPlease return your token to the Bank."); msg += "\nGame Over\nPlease return your token to the Bank.";
             var index = players.indexOf(player);
             players.splice(index, 1);
+
+            return msg;
     },
 
     getNewSpace: function(player, board, diceSum){
@@ -1498,9 +1552,9 @@ module.exports = {
 
     //Move player to spaceNum and trigger space action
     movePlayer: function(player, board, players, diceSum, newSpace, chanceCards, chestCards){
-
+        var msg = '';
         var currPos = player.get_space();
-        console.log("Move your piece to " + newSpace.get_name() + ".\n");
+        console.log("Move your piece to " + newSpace.get_name() + ".\n"); msg += "Move your piece to " + newSpace.get_name() + ".\n";
 
         if (board.indexOf(newSpace) < currPos){
             if (board.indexOf(newSpace) !== currPos - 3){
@@ -1517,5 +1571,7 @@ module.exports = {
             player.set_space(board.indexOf(newSpace));
             module.exports.actionSpace(newSpace, player, players, board, chanceCards, chestCards);
         }
+
+        return msg;
     }
 };
