@@ -1,4 +1,4 @@
-var board = require("./board");
+var board = require("./gameObjects");
 
 //Create Property Objects (In Order of Appearance on Board)
 var MedAve = new board.Property("Mediterranean Avenue", "MedAve", 1, 60, "purple", 2, 10, 30, 90, 160, 250, 50);
