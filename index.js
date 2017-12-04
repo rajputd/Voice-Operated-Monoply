@@ -134,7 +134,7 @@ function start_game(app) {
 	app.data.has_rolled_dice = false;
 
 	app.setContext(TURN_ACTION_CONTEXT);
-	app.ask('Great! The game will now start. ' + current_player_name + ' will go first. During your turn, you can  check your balance, mortgage and unmortgage any properties you own, buy and sell houses on any properties you have a monopoly on, trade with other players, and roll the dice to move.');
+	app.ask('Great! The game will now start. Players please select a player token and place it on GO. ' + current_player_name + ' will go first. During your turn, you can  check your balance, mortgage and unmortgage any properties you own, buy and sell houses on any properties you have a monopoly on, trade with other players, and roll the dice to move.');
 }
 
 function roll_dice(app) {
