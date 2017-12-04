@@ -30,6 +30,7 @@ const UNMORTGAGE_PROPERTY_ACTION = 'unmortgage_property';
 const GET_PROPERTY_OWNER_ACTION = 'get_property_owner';
 const BUILD_HOUSE_ACTION = 'build_house';
 const BUILD_HOTEL_ACTION = 'build_hotel';
+const END_TURN_ACTION = 'end_turn';
 
 // the parameters that are parsed from the make_name intent 
 const NUM_PLAYERS_ARGUMENT = 'num_players';
@@ -58,6 +59,7 @@ app.post('/', function (request, response) {
 	actionMap.set(GET_PROPERTY_OWNER_ACTION, get_property_owner);
 	actionMap.set(BUILD_HOUSE_ACTION, build_house);
 	actionMap.set(BUILD_HOTEL_ACTION, build_hotel);
+	actionMap.set(END_TURN_ACTION, end_turn);
 
 	app.handleRequest(actionMap);
 
@@ -179,4 +181,11 @@ function build_hotel(app) {
 	//check if user owns the property
 	//buy the hotel if the the user
 	app.ask('you built a hotel on ' + properties);
+}
+
+function end_turn(app) {
+	//set a new current player
+	//check if player CAN end their turn. e.g. have they rolled dice, etc?
+	var new_player = app.data.player_names[1];
+	app.ask('OK, ' + new_player + ' it is now your turn');
 }
