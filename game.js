@@ -35,10 +35,22 @@ module.exports = function(player_num, player_names) {
   var ParkPl = new board.Property("Park Place", "ParkPl", 37, 350, "dark-blue", 35, 175, 500, 1100, 1300, 1500, 200);
   var Boardwalk = new board.Property("Boardwalk", "Boardwalk", 39, 400, "dark-blue", 50, 200, 600, 1400, 1700, 2000, 200);
 
-  this.properties = [MedAve, BaltAve, ReadRail, OrientAve, VermAve, ConnAve,
+  var properties = [MedAve, BaltAve, ReadRail, OrientAve, VermAve, ConnAve,
       StCharPl, Electric, StateAve, VirgAve, PennRail, StJamePl, TennAve, NYAve,
       KentAve, IndAve, IllAve, BORail, AtlAve,  VentAve, Water, MarvGard, PacAve,
       NCAve, PennAve, SLRail, ParkPl, Boardwalk];
+
+  this.properties = properties;
+
+  this.getProperty = function(name) {
+    for(i = 0; i < properties.length; i++) {
+      if(properties[i].get_name() == name) {
+        return properties[i];
+      }
+    }
+    return "INVALID";
+  }
+
 
   //Define Spaces
   var space0 = new board.Space(0, "Go", "Go", "Action");
