@@ -186,19 +186,18 @@ module.exports = {
     	netWorth += player.get_cash();
 
     	// Iterate over all of the player's properties and add them to find the net worth.
-        for (index = 0; index < player.properties.length; index++) {
+        for (i = 0; i < player.properties.length; i++) {
 
             var properties = player.get_prop_list();
 
         	// Consider the value of the property.
-            netWorth += properties[index].get_price();
+            netWorth += properties[i].get_price();
         	// Consider the value of any building on the property.
 
         	// Add it to the player's total worth.
-        	netWorth += (properties[index].get_num_buildings()) * (properties[index].get_build_cost());
-
-                return netWorth;
+        	netWorth += (properties[i].get_num_buildings()) * (properties[i].get_build_cost());
         }
+        return netWorth;
     },
 
     // Mortage properties.
@@ -915,11 +914,8 @@ module.exports = {
             else if (id === "advBoard")
                 module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[39]);
 
-            else if (id === "goBack"){
-                //Move player back 3 spaces
-                //Needs to override Go function
-                //I'll flesh this out tomorrow (12/3)
-            }
+            else if (id === "goBack")
+                module.exports.movePlayer(player, gameBoard, players, 0, gameBoard[player.get_space() - 3]);
         }
     },
 
@@ -1356,6 +1352,34 @@ module.exports = {
         return [sum, doubles];
     },
 
+    // Bankruptcy function.
+    bankruptcy: function(player, cost){
+
+        if (cost >= player.get_cash()) {
+            console.log("Sorry, " + player.get_name() + ". You've gone bankrupt!");
+
+            // Iterate over all the properties a player has.
+            for (index = 0; index < player.properties.length(); index++) {
+
+                // If the property in question has houses or hotels, remove them from the property and return them to the bank.
+                if (properties[index].numHouses != 0 || properties[index].numHotels != 0) {
+                    numHouses += properties[index].numHouses;
+                    numHotels += properties[index].numHotels;
+                    properties[index].numHouses = 0;
+                    properties[index].numHotels = 0;
+                }
+
+                // Remove them from the ownership of the player.
+                player.remove_property(properties[index]);
+
+                // Set the property to not be owned by any players.
+                property.set_owner(null);
+            }
+
+            return;
+        }
+    },
+
     getNewSpace: function(player, board, diceSum){
 
         var currPos = player.get_space();
@@ -1379,8 +1403,11 @@ module.exports = {
         var currPos = player.get_space();
         console.log("Move your piece to " + newSpace.get_name() + ".\n");
 
-        if (board.indexOf(newSpace) < currPos)
+        if (board.indexOf(newSpace) < currPos){
+            if (board.indexOf(newSpace) !== currPos - 3){
                 module.exports.passGo(player);
+            }
+        }
 
         if (newSpace.get_type() === "Property"){
             player.set_space(board.indexOf(newSpace));
